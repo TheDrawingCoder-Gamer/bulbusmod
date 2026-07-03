@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "bulbus",
+  "version": "${version}",
+  "name": "bulbus",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "LGPL-3.0",
+  "icon": "assets/bulbus/icon.png",
+  "environment": "*",
+  "accessWidener": "bulbus.classtweaker",
+  "entrypoints": {
+    "client": [
+      "gay.menkissing.bulbus.client.BulbusModClient"
+    ],
+    "main": [
+      "gay.menkissing.bulbus.BulbusMod"
+    ],
+    "fabric-datagen": [
+      "gay.menkissing.bulbus.client.datagen.BulbusDatagen"
+    ]
+  },
+  "mixins": [
+    "bulbus.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

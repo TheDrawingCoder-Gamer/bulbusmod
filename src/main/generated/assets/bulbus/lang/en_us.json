@@ -1,0 +1,13 @@
+{
+  "item.bulbus.holding_bag": "Holding Bag",
+  "item.bulbus.stasis_battery": "Stasis Battery",
+  "item.bulbus.stasis_bottle": "Stasis Bottle",
+  "item.bulbus.stasis_bottle.tooltip.count_mb": "%1$s mB / %2$s buckets",
+  "item.bulbus.stasis_bottle.tooltip.empty": "Empty",
+  "item.bulbus.stasis_bottle.tooltip.usage_pickup": "Use to pickup",
+  "item.bulbus.stasis_bottle.tooltip.usage_place": "Shift-Use to place",
+  "item.bulbus.stasis_tube": "Stasis Tube",
+  "item.bulbus.stasis_tube.tooltip.count": "%1$d / %2$d (%3$s stacks)",
+  "item.bulbus.stasis_tube.tooltip.empty": "Empty",
+  "item.bulbus.tool_container": "Tool Container"
+}

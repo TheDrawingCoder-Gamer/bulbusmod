@@ -1,0 +1,51 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "cases": [
+      {
+        "model": {
+          "type": "minecraft:composite",
+          "models": [
+            {
+              "type": "minecraft:model",
+              "model": "bulbus:item/stasis_tube"
+            },
+            {
+              "type": "bulbus:stasis_tube/stored",
+              "transformation": {
+                "left_rotation": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "right_rotation": [
+                  -0.0,
+                  -0.0,
+                  -0.0,
+                  1.0
+                ],
+                "scale": [
+                  0.5,
+                  0.5,
+                  0.5
+                ],
+                "translation": [
+                  0.75,
+                  0.75,
+                  1.25
+                ]
+              }
+            }
+          ]
+        },
+        "when": "gui"
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "bulbus:item/stasis_tube"
+    },
+    "property": "minecraft:display_context"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "cases": [
+      {
+        "model": {
+          "type": "minecraft:composite",
+          "models": [
+            {
+              "type": "minecraft:model",
+              "model": "bulbus:item/stasis_bottle"
+            },
+            {
+              "type": "bulbus:stasis_bottle/stored",
+              "crop": [
+                7.0,
+                7.0,
+                15.0,
+                15.0
+              ],
+              "transformation": {
+                "left_rotation": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "right_rotation": [
+                  -0.0,
+                  -0.0,
+                  -0.0,
+                  1.0
+                ],
+                "scale": [
+                  1.0,
+                  1.0,
+                  1.0
+                ],
+                "translation": [
+                  0.0,
+                  0.0,
+                  1.0
+                ]
+              }
+            }
+          ]
+        },
+        "when": "gui"
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "bulbus:item/stasis_bottle"
+    },
+    "property": "minecraft:display_context"
+  }
+}
