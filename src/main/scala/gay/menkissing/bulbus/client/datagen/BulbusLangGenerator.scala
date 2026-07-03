@@ -24,3 +24,5 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
     translationBuilder.add(BulbusItems.holdingBag, "Holding Bag")
 
     translationBuilder.add(BulbusItems.toolContainer, "Tool Container")
+
+    translationBuilder.add(BulbusTranslationKeys.tab, "Bulbus")

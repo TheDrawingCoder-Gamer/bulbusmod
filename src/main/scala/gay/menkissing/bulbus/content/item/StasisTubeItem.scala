@@ -3,22 +3,28 @@ package gay.menkissing.bulbus.content.item
 import gay.menkissing.bulbus.components.StorageItemContents
 import StorageItemContents.Item.ext.*
 import gay.menkissing.bulbus.registries.{BulbusDataComponentTypes, BulbusTags}
+import gay.menkissing.bulbus.util.BulbusEnchantmentUtil
+import net.fabricmc.fabric.api.item.v1.EnchantingContext
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantItemStorage
-import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.{Holder, HolderLookup}
+import net.minecraft.core.component.{DataComponentGetter, DataComponentPatch}
 import net.minecraft.world.entity.SlotAccess
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.{ClickAction, Slot}
+import net.minecraft.world.item.enchantment.{Enchantment, Enchantments}
 import net.minecraft.world.item.{Item, ItemStack}
 
 class StasisTubeItem(props: Item.Properties) extends Item(props):
+  override def canBeEnchantedWith(stack: ItemStack, enchantment: Holder[Enchantment], context: EnchantingContext): Boolean =
+    super.canBeEnchantedWith(stack, enchantment, context) || enchantment.is(Enchantments.POWER)
+
   override def overrideStackedOnOther(self: ItemStack, slot: Slot, clickAction: ClickAction, player: Player): Boolean =
     if clickAction == ClickAction.SECONDARY then
       val thatStack = slot.getItem
       val contents = self.getOrDefault(BulbusDataComponentTypes.STASIS_TUBE_CONTENTS, StorageItemContents.Item.DEFAULT)
-      // todo, max
-      val builder = StorageItemContents.Item.builder(contents, StasisTubeItem.baseMax)
+      val builder = StorageItemContents.Item.builder(contents, StasisTubeItem.maxFromWorld(self, player.level().registryAccess()))
       if thatStack.isEmpty then
         val stack = builder.removeStack()
         if !stack.isEmpty then
@@ -35,8 +41,7 @@ class StasisTubeItem(props: Item.Properties) extends Item(props):
   override def overrideOtherStackedOnMe(self: ItemStack, other: ItemStack, slot: Slot, clickAction: ClickAction, player: Player, carriedItem: SlotAccess): Boolean =
     if clickAction == ClickAction.SECONDARY && slot.allowModification(player) then
       val contents = self.getOrDefault(BulbusDataComponentTypes.STASIS_TUBE_CONTENTS, StorageItemContents.Item.DEFAULT)
-      // todo, max
-      val builder = StorageItemContents.Item.builder(contents, StasisTubeItem.baseMax)
+      val builder = StorageItemContents.Item.builder(contents, StasisTubeItem.maxFromWorld(self, player.level().registryAccess()))
       if other.isEmpty then
         if !builder.isEmpty then
           val removed = builder.removeStack()
@@ -52,6 +57,15 @@ class StasisTubeItem(props: Item.Properties) extends Item(props):
 
 object StasisTubeItem:
   val baseMax: Long = 20_000
+
+  def getMaxAmount(level: Int): Long =
+    baseMax * math.pow(10, math.min(5, level)).toLong
+
+  def maxFromWorld(stack: DataComponentGetter, lookup: HolderLookup.Provider): Long =
+    getMaxAmount(BulbusEnchantmentUtil.getLevel(lookup, Enchantments.POWER, stack))
+
+  def getMaxEvil(stack: DataComponentGetter): Long =
+    getMaxAmount(BulbusEnchantmentUtil.getLevelEvil(Enchantments.POWER, stack))
 
   def validStack(stack: ItemStack): Boolean =
     stack.getItem.canFitInsideContainerItems && !stack.is(BulbusTags.item.tubeBlacklist)

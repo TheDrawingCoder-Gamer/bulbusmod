@@ -2,7 +2,7 @@ package gay.menkissing.bulbus.registries
 
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.components.StorageItemContents
-import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem}
+import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem, ToolContainerItem}
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage
@@ -58,7 +58,7 @@ object BulbusItems:
     "tool_container",
     Item.Properties()
         .stacksTo(1),
-    Item.apply
+    ToolContainerItem.apply
   )
 
   val bulbusTab = FabricCreativeModeTab.builder()
@@ -77,13 +77,11 @@ object BulbusItems:
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, BulbusMod.locate("tab"), bulbusTab)
 
     FluidStorage.ITEM.registerForItems(
-      // todo max
-      (stack, c) => StasisBottleItem.StasisBottleStorage(c, StasisBottleItem.baseMax),
+      (stack, c) => StasisBottleItem.StasisBottleStorage(c, StasisBottleItem.getMaxEvil(stack)),
       stasisBottle
     )
 
     ItemStorage.ITEM.registerForItems(
-      // todo max
-      (stack, c) => StasisTubeItem.StasisTubeStorage(c, StasisTubeItem.baseMax),
+      (stack, c) => StasisTubeItem.StasisTubeStorage(c, StasisTubeItem.getMaxEvil(stack)),
       stasisTube
     )

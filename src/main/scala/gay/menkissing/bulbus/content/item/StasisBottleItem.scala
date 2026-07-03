@@ -2,7 +2,7 @@ package gay.menkissing.bulbus.content.item
 
 import gay.menkissing.bulbus.components.StorageItemContents
 import gay.menkissing.bulbus.registries.BulbusDataComponentTypes
-import gay.menkissing.bulbus.util.FluidUtil
+import gay.menkissing.bulbus.util.{BulbusEnchantmentUtil, FluidUtil}
 import net.fabricmc.fabric.api.item.v1.EnchantingContext
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.fluid.base.SingleFluidStorage
@@ -11,8 +11,8 @@ import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantItemStorage
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
-import net.minecraft.core.component.DataComponentPatch
-import net.minecraft.core.{BlockPos, Holder}
+import net.minecraft.core.component.{DataComponentGetter, DataComponentPatch}
+import net.minecraft.core.{BlockPos, Holder, HolderLookup}
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.SoundSource
 import net.minecraft.world.{InteractionHand, InteractionResult}
@@ -47,8 +47,7 @@ class StasisBottleItem(props: Item.Properties) extends Item(props):
           InteractionResult.FAIL
         else
           val hitState = level.getBlockState(hitPos)
-          // todo, max
-          val builder = StorageItemContents.Fluid.builder(contents, StasisBottleItem.baseMax)
+          val builder = StorageItemContents.Fluid.builder(contents, StasisBottleItem.getMaxFromWorld(stack, player.level().registryAccess()))
           if player.isShiftKeyDown then
             // placing
             val targetPos = if hitState.getBlock.isInstanceOf[LiquidBlockContainer] then hitPos else placePos
@@ -87,11 +86,20 @@ object StasisBottleItem:
 
   val baseMax: Long = FluidConstants.BUCKET * 256
 
+  def getMaxAmount(level: Int): Long =
+    baseMax * math.pow(8, math.min(level, 5)).toLong
+
+  def getMaxFromWorld(stack: DataComponentGetter, lookup: HolderLookup.Provider): Long =
+    getMaxAmount(BulbusEnchantmentUtil.getLevel(lookup, Enchantments.POWER, stack))
+
+  def getMaxEvil(stack: DataComponentGetter): Long =
+    getMaxAmount(BulbusEnchantmentUtil.getLevelEvil(Enchantments.POWER, stack))
+
   final class StasisBottleStorage(context: ContainerItemContext, val capacity: Long) extends SingleVariantItemStorage[FluidVariant](context):
     override def getCapacity(variant: FluidVariant): Long = capacity
 
     override def getBlankResource: FluidVariant = FluidVariant.blank()
-    
+
 
     override def getUpdatedVariant(currentVariant: ItemVariant, newResource: FluidVariant, newAmount: Long): ItemVariant =
       val newContents = StorageItemContents[FluidVariant](newResource, newAmount)

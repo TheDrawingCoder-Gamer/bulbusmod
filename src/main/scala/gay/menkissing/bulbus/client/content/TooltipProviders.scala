@@ -17,8 +17,7 @@ object TooltipProviders:
         consumer(Component.translatable(BulbusTranslationKeys.stasisBottle.tooltip.empty))
         consumer(Component.translatable(BulbusTranslationKeys.stasisBottle.tooltip.usagePickup))
       else
-        // todo
-        val max = StasisBottleItem.baseMax
+        val max = StasisBottleItem.getMaxFromWorld(getter, tooltip.registries())
         consumer(BulbusTranslationKeys.stasisBottle.tooltip.showCountMB(self.amount, max))
         consumer(FluidVariantAttributes.getName(self.variant))
         consumer(Component.translatable(BulbusTranslationKeys.stasisBottle.tooltip.usagePickup))
@@ -30,8 +29,7 @@ object TooltipProviders:
         consumer(Component.translatable(BulbusTranslationKeys.stasisTube.tooltip.empty))
       else
         val contained = self.variant.toStack
-        // todo
-        val max = StasisTubeItem.baseMax
+        val max = StasisTubeItem.maxFromWorld(getter, tooltip.registries())
         val totalStacks = math.floorDiv(self.amount, contained.getMaxStackSize).toString
         consumer(BulbusTranslationKeys.stasisTube.tooltip.showCount(self.amount, max, totalStacks))
         consumer(contained.getHoverName)

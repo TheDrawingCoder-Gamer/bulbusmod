@@ -16,4 +16,6 @@ object BulbusTags:
 
     val tubeBlacklist: TagKey[Item] = tag("tube_blacklist")
     
+    val validToolTag: TagKey[Item] = tag("valid_tools")
+    
     
