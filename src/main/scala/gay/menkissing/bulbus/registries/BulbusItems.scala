@@ -2,7 +2,7 @@ package gay.menkissing.bulbus.registries
 
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.components.StorageItemContents
-import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem, ToolContainerItem}
+import gay.menkissing.bulbus.content.item.{HoldingBagItem, StasisBottleItem, StasisTubeItem, ToolContainerItem}
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage
@@ -51,7 +51,7 @@ object BulbusItems:
     "holding_bag",
     Item.Properties()
         .stacksTo(1),
-    Item.apply
+    HoldingBagItem.apply
   )
   
   val toolContainer: Item = register(
