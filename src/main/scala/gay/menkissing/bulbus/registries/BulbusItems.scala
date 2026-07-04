@@ -10,7 +10,7 @@ import net.minecraft.core.Registry
 import net.minecraft.core.registries.{BuiltInRegistries, Registries}
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.item.{BlockItem, Item, ItemStack}
+import net.minecraft.world.item.{BlockItem, CreativeModeTab, Item, ItemStack}
 import net.minecraft.world.level.block.Block
 
 object BulbusItems:
@@ -72,17 +72,21 @@ object BulbusItems:
 
   val stasisShelf: Item = registerBlock(BulbusBlocks.stasisShelf)
 
-  val bulbusTab = FabricCreativeModeTab.builder()
-                                       .icon(() => ItemStack(stasisBottle))
-                                       .title(Component.translatable(BulbusTranslationKeys.tab))
-                                       .displayItems: (params, output) =>
-                                         output.accept(stasisTube)
-                                         output.accept(stasisBottle)
-                                         output.accept(stasisBattery)
-                                         output.accept(holdingBag)
-                                         output.accept(toolContainer)
-                                         output.accept(stasisShelf)
-                                       .build()
+  val stasisWorm: Item = registerBlock(BulbusBlocks.stasisWorm)
+
+  val bulbusTab: CreativeModeTab =
+    FabricCreativeModeTab.builder()
+                         .icon(() => ItemStack(stasisBottle))
+                         .title(Component.translatable(BulbusTranslationKeys.tab))
+                         .displayItems: (params, output) =>
+                           output.accept(stasisTube)
+                           output.accept(stasisBottle)
+                           output.accept(stasisBattery)
+                           output.accept(holdingBag)
+                           output.accept(toolContainer)
+                           output.accept(stasisShelf)
+                           output.accept(stasisWorm)
+                         .build()
 
 
   def init(): Unit =

@@ -2,6 +2,7 @@ package gay.menkissing.bulbus.registries
 
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.content.block.entity.StasisStorageBlockEntity.StasisShelfBlockEntity
+import gay.menkissing.bulbus.content.block.entity.{StasisStorageBlockEntity, StasisWormBlockEntity}
 import net.fabricmc.fabric.api.`object`.builder.v1.block.entity.FabricBlockEntityTypeBuilder
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage
@@ -17,13 +18,16 @@ object BulbusBlockEntities:
     Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id, FabricBlockEntityTypeBuilder.create(factory, blocks*).build())
 
   val stasisShelf: BlockEntityType[StasisShelfBlockEntity] = makeEntity("stasis_shelf", StasisShelfBlockEntity.apply, BulbusBlocks.stasisShelf)
+  val stasisWorm: BlockEntityType[StasisWormBlockEntity] = makeEntity("stasis_worm", StasisWormBlockEntity.apply, BulbusBlocks.stasisWorm)
   
   def init(): Unit =
-    ItemStorage.SIDED.registerForBlockEntity[StasisShelfBlockEntity](
-      (a, _) => a.itemStorage,
-      stasisShelf
+    ItemStorage.SIDED.registerForBlockEntities(
+      (a, _) => a.asInstanceOf[StasisStorageBlockEntity].itemStorage,
+      stasisShelf,
+      stasisWorm
     )
-    FluidStorage.SIDED.registerForBlockEntity[StasisShelfBlockEntity](
-      (a, _) => a.fluidStorage,
-      stasisShelf
+    FluidStorage.SIDED.registerForBlockEntities(
+      (a, _) => a.asInstanceOf[StasisStorageBlockEntity].fluidStorage,
+      stasisShelf,
+      stasisWorm
     )

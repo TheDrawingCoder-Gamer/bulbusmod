@@ -1,6 +1,6 @@
 package gay.menkissing.bulbus.client.datagen.models
 
-import com.mojang.math.Transformation
+import com.mojang.math.{Quadrant, Transformation}
 import gay.menkissing.bulbus.client.content.itemmodels.{BottleFluidContentsModel, TubeStoredItemSpecialRenderer}
 import gay.menkissing.bulbus.registries.{BulbusBlocks, BulbusItems}
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
@@ -8,11 +8,12 @@ import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.minecraft.client.data.models.blockstates.{MultiVariantGenerator, PropertyDispatch}
 import net.minecraft.client.data.models.model.{ItemModelUtils, ModelLocationUtils, ModelTemplate, ModelTemplates, TextureMapping, TextureSlot, TexturedModel}
 import net.minecraft.client.data.models.{BlockModelGenerators, ItemModelGenerators, MultiVariant}
-import net.minecraft.client.renderer.block.dispatch.Variant
+import net.minecraft.client.renderer.block.dispatch.{Variant, VariantMutator}
 import net.minecraft.client.renderer.item.SelectItemModel.SwitchCase
 import net.minecraft.client.renderer.item.properties.select.DisplayContext
 import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.Direction
 import net.minecraft.resources.Identifier
 import net.minecraft.util.random.WeightedList
 import net.minecraft.world.item.{Item, ItemDisplayContext}
@@ -22,7 +23,6 @@ import org.joml.{Matrix4f, Vector4f}
 
 import java.util.Optional
 import java.util as ju
-
 import BulbusModelGenerator.*
 
 class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider(output):
@@ -43,6 +43,29 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
         PropertyDispatch.initial(BlockStateProperties.OPEN)
                         .selectV(false, Variant(closedShelf))
                         .selectV(true, Variant(openShelf))
+  
+    val (closedWorm, openWorm) = barrelLikeModels(BulbusBlocks.stasisWorm, blockModelGenerators)
+    blockModelGenerators.blockStateOutput.accept:
+      MultiVariantGenerator.dispatch(BulbusBlocks.stasisWorm).`with`:
+        PropertyDispatch.initial(BlockStateProperties.OPEN)
+                        .selectV(false, Variant(closedWorm))
+                        // i tremor at the pour soul who looks into an open worm
+                        .selectV(true, Variant(openWorm))
+      .`with`:
+        PropertyDispatch.modify(BlockStateProperties.FACING).generate: dir =>
+          val xRot =
+            dir match
+              case Direction.DOWN => Quadrant.R180
+              case Direction.UP => Quadrant.R0
+              case _ => Quadrant.R90
+          val yRot =
+            dir match
+              case Direction.SOUTH => Quadrant.R180
+              case Direction.WEST => Quadrant.R270
+              case Direction.EAST => Quadrant.R90
+              case _ => Quadrant.R0
+          
+          VariantMutator.X_ROT.withValue(xRot).`then`(VariantMutator.Y_ROT.withValue(yRot))
 
   // get a block material from an item because fuck you thats why
   // need this to prevent translucency shenanagins from fucking us up

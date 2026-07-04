@@ -39,14 +39,14 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   protected val itemStorages: NonNullList[StasisStorageBlockEntity.HasFilterable[ItemVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyItemSlot)
   protected val fluidStorages: NonNullList[StasisStorageBlockEntity.HasFilterable[FluidVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyFluidSlot)
 
-  val itemStorage: CombinedSlottedStorage[ItemVariant, StasisStorageBlockEntity.HasFilterable[ItemVariant]] =
+  val itemStorage: SlottedStorage[ItemVariant] =
     CombinedSlottedStorage(itemStorages)
 
-  val fluidStorage: CombinedSlottedStorage[FluidVariant, StasisStorageBlockEntity.HasFilterable[FluidVariant]] =
+  val fluidStorage: SlottedStorage[FluidVariant] =
     CombinedSlottedStorage(fluidStorages)
 
   override def preRemoveSideEffects(pos: BlockPos, state: BlockState): Unit =
-    if !state.is(getBlockState.getBlock) then
+    if level != null then
       StasisStorageBlockEntity.dropContents(getLevel, pos, this)
 
   def clearContent(): Unit =
