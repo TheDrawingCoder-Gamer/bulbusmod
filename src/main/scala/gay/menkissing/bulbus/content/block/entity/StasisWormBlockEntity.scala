@@ -102,10 +102,12 @@ object StasisWormBlockEntity:
         amount
 
     override def iterator(): ju.Iterator[StorageView[T]] =
+      // we MUST evaluate this now to prevent looping
+      val nextIterator = withNext(_.iterator().asScala).getOrElse(Iterator.empty)
       storages.iterator()
               .asScala
               .concat(
-                withNext(_.iterator().asScala).getOrElse(Iterator.empty)
+                nextIterator
               ).asJava
 
   final class WormItemStorages(override val parent: StasisWormBlockEntity) extends StorageMixin[ItemVariant]:
