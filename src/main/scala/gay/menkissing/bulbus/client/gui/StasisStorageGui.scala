@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Inventory
 class StasisStorageGui(menu: StasisStorageMenu, inventory: Inventory, component: Component)
   extends AbstractContainerScreen[StasisStorageMenu](menu, inventory, component):
   override def extractBackground(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float): Unit =
+    super.extractBackground(graphics, mouseX, mouseY, a)
     val i = (this.width - this.imageWidth) / 2
     val j = (this.height - this.imageHeight) / 2
     graphics.blit(RenderPipelines.GUI_TEXTURED, StasisStorageGui.texture, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256)
