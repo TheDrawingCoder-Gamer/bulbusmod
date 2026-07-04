@@ -16,7 +16,7 @@ trait NameableBlockEntity extends BlockEntity, Nameable:
   def setCustomName(name: Component): Unit =
     this.name = Option(name)
 
-  override def getCustomName: Component =
+  override def getCustomName: Component | Null =
     name.orNull
 
   override def loadAdditional(input: ValueInput): Unit =
@@ -25,4 +25,4 @@ trait NameableBlockEntity extends BlockEntity, Nameable:
 
   override def saveAdditional(output: ValueOutput): Unit =
     super.saveAdditional(output)
-    output.storeNullable("CustomName", ComponentSerialization.CODEC, name.orNull)
+    output.storeNullable("CustomName", ComponentSerialization.CODEC, name.orNull[Component | Null])

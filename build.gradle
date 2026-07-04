@@ -88,6 +88,7 @@ java {
 
 tasks.withType(ScalaCompile).configureEach {
     it.scalaCompileOptions.additionalParameters.add("-release:25")
+    it.scalaCompileOptions.additionalParameters.add("-Yexplicit-nulls")
 }
 
 jar {
