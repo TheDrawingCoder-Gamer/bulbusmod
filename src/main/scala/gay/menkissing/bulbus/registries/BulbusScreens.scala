@@ -1,7 +1,7 @@
 package gay.menkissing.bulbus.registries
 
 import gay.menkissing.bulbus.BulbusMod
-import gay.menkissing.bulbus.screen.{HoldingBagMenu, ToolContainerMenu}
+import gay.menkissing.bulbus.screen.{HoldingBagMenu, StasisStorageMenu, ToolContainerMenu}
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -16,7 +16,10 @@ object BulbusScreens:
   val holdingBagMenu: MenuType[ChestMenu] =
     MenuType(HoldingBagMenu.fromNetwork, FeatureFlags.VANILLA_SET)
   
+  val stasisStorageMenu: MenuType[StasisStorageMenu] =
+    MenuType(StasisStorageMenu.client, FeatureFlags.VANILLA_SET)
   
   def init(): Unit =
     Registry.register(BuiltInRegistries.MENU, BulbusMod.locate("tool_container"), toolContainer)
     Registry.register(BuiltInRegistries.MENU, BulbusMod.locate("holding_bag"), holdingBagMenu)
+    Registry.register(BuiltInRegistries.MENU, BulbusMod.locate("stasis_storage"), stasisStorageMenu)

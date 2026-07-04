@@ -18,4 +18,6 @@ object BulbusTags:
     
     val validToolTag: TagKey[Item] = tag("valid_tools")
     
+    val voidsInsertInShelf: TagKey[Item] = tag("voids_insert_in_shelf")
+    
     

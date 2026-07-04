@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "open=false": {
+      "model": "bulbus:block/stasis_shelf"
+    },
+    "open=true": {
+      "model": "bulbus:block/stasis_shelf_open"
+    }
+  }
+}

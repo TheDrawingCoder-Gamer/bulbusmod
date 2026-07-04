@@ -10,8 +10,8 @@ import net.minecraft.core.Registry
 import net.minecraft.core.registries.{BuiltInRegistries, Registries}
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.{BlockItem, Item, ItemStack}
+import net.minecraft.world.level.block.Block
 
 object BulbusItems:
   def register[T <: Item](name: String, props: Item.Properties, itemFactory: Item.Properties => T): T =
@@ -20,6 +20,15 @@ object BulbusItems:
     val goodItem = itemFactory(goodProps)
     Registry.register(BuiltInRegistries.ITEM, BulbusMod.locate(name), goodItem)
     goodItem
+
+
+  def registerBlock(block: Block, props: Item.Properties = Item.Properties()): BlockItem =
+    val blockId = block.properties().blockIdOrThrow()
+    val itemId = ResourceKey.create(Registries.ITEM, blockId.identifier())
+    val item = new BlockItem(block, props.setId(itemId).useBlockDescriptionPrefix())
+    item.registerBlocks(Item.BY_BLOCK, item)
+
+    Registry.register(BuiltInRegistries.ITEM, itemId, item)
 
   val stasisBottle: Item = register(
     "stasis_bottle",
@@ -61,6 +70,8 @@ object BulbusItems:
     ToolContainerItem.apply
   )
 
+  val stasisShelf: Item = registerBlock(BulbusBlocks.stasisShelf)
+
   val bulbusTab = FabricCreativeModeTab.builder()
                                        .icon(() => ItemStack(stasisBottle))
                                        .title(Component.translatable(BulbusTranslationKeys.tab))
@@ -70,6 +81,7 @@ object BulbusItems:
                                          output.accept(stasisBattery)
                                          output.accept(holdingBag)
                                          output.accept(toolContainer)
+                                         output.accept(stasisShelf)
                                        .build()
 
 

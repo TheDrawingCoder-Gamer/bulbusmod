@@ -2,23 +2,47 @@ package gay.menkissing.bulbus.client.datagen.models
 
 import com.mojang.math.Transformation
 import gay.menkissing.bulbus.client.content.itemmodels.{BottleFluidContentsModel, TubeStoredItemSpecialRenderer}
-import gay.menkissing.bulbus.registries.BulbusItems
+import gay.menkissing.bulbus.registries.{BulbusBlocks, BulbusItems}
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
-import net.minecraft.client.data.models.model.{ItemModelUtils, ModelLocationUtils, ModelTemplate, ModelTemplates, TextureMapping}
-import net.minecraft.client.data.models.{BlockModelGenerators, ItemModelGenerators}
+import net.minecraft.client.data.models.blockstates.{MultiVariantGenerator, PropertyDispatch}
+import net.minecraft.client.data.models.model.{ItemModelUtils, ModelLocationUtils, ModelTemplate, ModelTemplates, TextureMapping, TextureSlot, TexturedModel}
+import net.minecraft.client.data.models.{BlockModelGenerators, ItemModelGenerators, MultiVariant}
+import net.minecraft.client.renderer.block.dispatch.Variant
 import net.minecraft.client.renderer.item.SelectItemModel.SwitchCase
 import net.minecraft.client.renderer.item.properties.select.DisplayContext
 import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.Identifier
+import net.minecraft.util.random.WeightedList
 import net.minecraft.world.item.{Item, ItemDisplayContext}
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.joml.{Matrix4f, Vector4f}
 
 import java.util.Optional
 import java.util as ju
 
+import BulbusModelGenerator.*
+
 class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider(output):
-  override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit = ()
+  def barrelLikeModels(block: Block, blockModelGenerators: BlockModelGenerators): (Identifier, Identifier) =
+    val closedModel = TexturedModel.CUBE_TOP_BOTTOM.create(block, blockModelGenerators.modelOutput)
+    val openMapping = (new TextureMapping)
+      .put(TextureSlot.SIDE, TextureMapping.getBlockTexture(block, "_side"))
+      .put(TextureSlot.TOP, TextureMapping.getBlockTexture(block, "_top_open"))
+      .put(TextureSlot.BOTTOM, TextureMapping.getBlockTexture(block, "_bottom"))
+    val openModel = ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(block, "_open", openMapping, blockModelGenerators.modelOutput)
+    (closedModel, openModel)
+
+  override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
+    val (closedShelf, openShelf) = barrelLikeModels(BulbusBlocks.stasisShelf, blockModelGenerators)
+    // somehow made this more complex between versions, thanks mojang
+    blockModelGenerators.blockStateOutput.accept:
+      MultiVariantGenerator.dispatch(BulbusBlocks.stasisShelf).`with`:
+        PropertyDispatch.initial(BlockStateProperties.OPEN)
+                        .selectV(false, Variant(closedShelf))
+                        .selectV(true, Variant(openShelf))
 
   // get a block material from an item because fuck you thats why
   // need this to prevent translucency shenanagins from fucking us up
@@ -61,3 +85,10 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
     itemModelGenerators.generateFlatItem(BulbusItems.stasisBattery, ModelTemplates.FLAT_ITEM)
     itemModelGenerators.generateFlatItem(BulbusItems.toolContainer, ModelTemplates.FLAT_ITEM)
     itemModelGenerators.generateFlatItem(BulbusItems.holdingBag, ModelTemplates.FLAT_ITEM)
+
+
+object BulbusModelGenerator:
+  extension[T <: Comparable[T]] (self: PropertyDispatch.C1[MultiVariant, T])
+    def selectV(value: T, variant: Variant): self.type =
+      self.select(value, MultiVariant(WeightedList.of(variant)))
+      self
