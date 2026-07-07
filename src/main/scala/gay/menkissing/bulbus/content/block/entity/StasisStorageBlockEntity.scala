@@ -2,11 +2,12 @@ package gay.menkissing.bulbus.content.block.entity
 
 import gay.menkissing.bulbus.components.StorageItemContents
 import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem}
+import gay.menkissing.bulbus.infra.lookup.StasisStorage
 import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusDataComponentTypes, BulbusItems, BulbusTags, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.{CommonStasisStorageMenu, StasisStorageMenu}
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
+import net.fabricmc.fabric.api.transfer.v1.item.{ContainerStorage, ItemVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.{SlottedStorage, StoragePreconditions, TransferVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage, SingleSlotStorage, SingleVariantItemStorage, SingleVariantStorage}
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
@@ -36,8 +37,8 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   protected val items: NonNullList[ItemStack] = NonNullList.withSize(capacity, ItemStack.EMPTY)
   protected var lastInteractedSlot: Int = -1
 
-  protected val itemStorages: NonNullList[StasisStorageBlockEntity.HasFilterable[ItemVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyItemSlot)
-  protected val fluidStorages: NonNullList[StasisStorageBlockEntity.HasFilterable[FluidVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyFluidSlot)
+  protected val itemStorages: NonNullList[StasisStorage[ItemVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyItemSlot)
+  protected val fluidStorages: NonNullList[StasisStorage[FluidVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyFluidSlot)
 
   val itemStorage: SlottedStorage[ItemVariant] =
     CombinedSlottedStorage(itemStorages)
@@ -73,16 +74,14 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
   protected def updateSlot(slot: Int, registries: HolderLookup.Provider): Unit =
     val stack = this.items.get(slot)
-    if StasisStorageBlockEntity.StorageTests.isTube(stack) then
-      StorageManager.loadTubeSlot(slot, registries)
-    else if StasisStorageBlockEntity.StorageTests.isBottle(stack) then
-      StorageManager.loadBottleSlot(slot, registries)
-    else if StasisStorageBlockEntity.StorageTests.isBattery(stack) then
+    if StasisStorageBlockEntity.StorageTests.isBattery(stack) then
       StorageManager.removeSlot(slot)
     else if StasisStorageBlockEntity.StorageTests.isGarbage(stack) then
       StorageManager.setVoidingSlot(slot)
-    else
+    else if stack.isEmpty then
       StorageManager.removeSlot(slot)
+    else
+      StorageManager.loadStorageSlot(slot)
 
   override protected def loadAdditional(input: ValueInput): Unit =
     super.loadAdditional(input)
@@ -128,24 +127,51 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
         tag.putByte("Slot", i.toByte)
         tag.store("variant", FluidVariant.CODEC, filter)
 
+  val containerView: Container
+  
+  val containerStorage: ContainerStorage
+  
+  
+
+  class ContainerForStasisStorage extends Container:
+    def parent: StasisStorageBlockEntity = StasisStorageBlockEntity.this
+
+    def getContainerSize: Int = capacity
+
+    override def clearContent(): Unit =
+      items.clear()
+      (0 until capacity).foreach(StorageManager.removeSlot)
+
+    override def getItem(slot: Int): ItemStack =
+      items.get(slot)
+
+    override def isEmpty: Boolean = parent.isEmpty
+
+    override def removeItem(slot: Int, count: Int): ItemStack =
+      parent.removeItem(slot, count)
+
+    override def removeItemNoUpdate(slot: Int): ItemStack =
+      parent.removeItem(slot, 1)
+
+    override def setChanged(): Unit =
+      parent.setChanged()
+
+    override def setItem(slot: Int, itemStack: ItemStack): Unit =
+      parent.setItem(slot, itemStack)
+
+    override def stillValid(player: Player): Boolean = Container.stillValidBlockEntity(parent, player)
+  
   object StorageManager:
     object item:
       def removeSlot(slot: Int): Unit =
         itemStorages.set(slot, StasisStorageBlockEntity.EmptyItemSlot)
 
       def unsetSlot(slot: Int): Unit =
-        itemStorages.get(slot).unset()
+        itemStorages.get(slot).unsetFilter()
 
       def setSlotFilter(slot: Int, variant: ItemVariant): Unit =
         itemStorages.get(slot).setFilter(variant)
-
-      def loadTubeSlot(slot: Int, registries: HolderLookup.Provider): Unit =
-        val stack = items.get(slot)
-        val contents = stack.getOrDefault(BulbusDataComponentTypes.STASIS_TUBE_CONTENTS, StorageItemContents.Item.DEFAULT)
-        val max = StasisTubeItem.maxFromWorld(stack, registries)
-        val storage = new StasisStorageBlockEntity.TubeItemStorage(StasisStorageBlockEntity.this, max, stack)
-        storage.setFilter(contents.variant)
-        itemStorages.set(slot, storage)
+      
 
       def setVoidingSlot(slot: Int): Unit =
         itemStorages.set(slot, StasisStorageBlockEntity.VoidingItemSlot)
@@ -155,19 +181,10 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
         fluidStorages.set(slot, StasisStorageBlockEntity.EmptyFluidSlot)
 
       def unsetSlot(slot: Int): Unit =
-        fluidStorages.get(slot).unset()
+        fluidStorages.get(slot).unsetFilter()
 
       def setSlotFilter(slot: Int, variant: FluidVariant): Unit =
         fluidStorages.get(slot).setFilter(variant)
-
-      def loadBottleSlot(slot: Int, registries: HolderLookup.Provider): Unit =
-        val stack = items.get(slot)
-        val contents = stack
-          .getOrDefault(BulbusDataComponentTypes.STASIS_BOTTLE_CONTENTS, StorageItemContents.Fluid.DEFAULT)
-        val max = StasisBottleItem.getMaxFromWorld(stack, registries)
-        val storage = new StasisStorageBlockEntity.BottleFluidStorage(StasisStorageBlockEntity.this, max, stack)
-        storage.setFilter(contents.variant)
-        fluidStorages.set(slot, storage)
 
       def setVoidingSlot(slot: Int): Unit =
         fluidStorages.set(slot, StasisStorageBlockEntity.VoidingFluidSlot)
@@ -175,14 +192,20 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
     def removeSlot(slot: Int): Unit =
       item.removeSlot(slot)
       fluid.removeSlot(slot)
-
-    def loadTubeSlot(slot: Int, registries: HolderLookup.Provider): Unit =
-      fluid.removeSlot(slot)
-      item.loadTubeSlot(slot, registries)
-
-    def loadBottleSlot(slot: Int, registries: HolderLookup.Provider): Unit =
-      item.removeSlot(slot)
-      fluid.loadBottleSlot(slot, registries)
+      
+    def loadStorageSlot(slot: Int): Unit =
+      val stack = items.get(slot)
+      val ctx = ContainerItemContext.ofSingleSlot(containerStorage.getSlot(slot))
+      removeSlot(slot)
+      StasisStorage.item.find(stack, ctx) match
+        case null => ()
+        case storage => itemStorages.set(slot, storage)
+      StasisStorage.fluid.find(stack, ctx) match
+        case null => ()
+        case storage => fluidStorages.set(slot, storage)
+          
+          
+      
 
     def setVoidingSlot(slot: Int): Unit =
       item.setVoidingSlot(slot)
@@ -213,35 +236,7 @@ abstract class PlainContainerStasisStorageBlockEntity(capacity: Int, baseEntity:
       this.level.getRandom.nextFloat() * 0.1f + 0.9f
     )
 
-  val containerView: Container = new ContainerForStasisStorage
 
-  class ContainerForStasisStorage extends Container:
-    def parent: PlainContainerStasisStorageBlockEntity = PlainContainerStasisStorageBlockEntity.this
-
-    def getContainerSize: Int = capacity
-
-    override def clearContent(): Unit =
-      items.clear()
-      (0 until capacity).foreach(StorageManager.removeSlot)
-
-    override def getItem(slot: Int): ItemStack =
-      items.get(slot)
-
-    override def isEmpty: Boolean = parent.isEmpty
-
-    override def removeItem(slot: Int, count: Int): ItemStack =
-      parent.removeItem(slot, count)
-
-    override def removeItemNoUpdate(slot: Int): ItemStack =
-      parent.removeItem(slot, 1)
-
-    override def setChanged(): Unit =
-      parent.setChanged()
-
-    override def setItem(slot: Int, itemStack: ItemStack): Unit =
-      parent.setItem(slot, itemStack)
-
-    override def stillValid(player: Player): Boolean = Container.stillValidBlockEntity(parent, player)
 
 abstract class ContainerStasisStorageBlockEntity(capacity: Int, baseEntity: BlockEntityType[? <: ContainerStasisStorageBlockEntity], pos: BlockPos, state: BlockState)
   extends PlainContainerStasisStorageBlockEntity(capacity, baseEntity, pos, state):
@@ -307,121 +302,21 @@ abstract class ContainerStasisStorageBlockEntity(capacity: Int, baseEntity: Bloc
 object StasisStorageBlockEntity:
   val tagFluidFilters = "fluid_filters"
   val tagItemFilters = "item_filters"
+  
+  
 
-  trait HasFilterable[T] extends SlottedStorage[T]:
-    def setFilter(filter: T): Unit
-    def getFilter: T
-    def unset(): Unit
-
-  trait HasItemFilterable extends HasFilterable[ItemVariant]
-
-  trait HasFluidFilterable extends HasFilterable[FluidVariant]
-
-  trait NonextractableSlot[T] extends SingleSlotStorage[T], HasFilterable[T]:
+  trait NonextractableSlot[T] extends SingleSlotStorage[T], StasisStorage[T]:
     protected def getBlank: T
     override def setFilter(filter: T): Unit = ()
     override def getFilter: T = getBlank
-    override def unset(): Unit = ()
+    override def unsetFilter(): Unit = ()
     override def extract(resource: T, maxAmount: Long, transaction: TransactionContext): Long = 0
     override def isResourceBlank: Boolean = true
     override def getResource: T = getBlank
     override def getAmount: Long = 0
     override def getCapacity: Long = 0
-
-  abstract class FilterableStorage[T <: TransferVariant[?]](val parent: StasisStorageBlockEntity, val capacity: Long, val stack: ItemStack) extends SnapshotParticipant[StorageItemContents[T]], SingleSlotStorage[T], HasFilterable[T]:
-    var filter: T = getBlankResource
-
-    protected def getBlankResource: T
-
-    val contentsType: DataComponentType[StorageItemContents[T]]
-
-    def defaultContents: StorageItemContents[T]
-
-    override def setFilter(filter: T): Unit = this.filter = filter
-
-    override def getFilter: T = this.filter
-
-    override def unset(): Unit = this.filter = getBlankResource
-
-    protected def contents: StorageItemContents[T] =
-      stack.getOrDefault(contentsType, defaultContents)
-
-    protected def applyContents(contents: StorageItemContents[T]): Unit =
-      stack.set(contentsType, contents)
-
-    override def getCapacity: Long = capacity
-
-    override def getResource: T =
-      contents.variant
-
-    override def isResourceBlank: Boolean = getResource.isBlank
-
-    override def getAmount: Long =
-      contents.amount
-
-    def validVariant(storedVariant: T, resource: T): Boolean =
-      if !storedVariant.isBlank then
-        filter = storedVariant
-
-      filter.isBlank || filter == resource
-
-    override def createSnapshot(): StorageItemContents[T] = contents
-
-    override def readSnapshot(snapshot: StorageItemContents[T]): Unit =
-      applyContents(snapshot)
-
-    override def insert(resource: T, maxAmount: Long, transaction: TransactionContext): Long =
-      StoragePreconditions.notBlankNotNegative(resource, maxAmount)
-
-      val contents = this.contents
-
-      val builder = StorageItemContents.Builder(contents.variant, contents.amount, capacity, getBlankResource)
-
-      if validVariant(builder.template, resource) then
-        this.updateSnapshots(transaction)
-        val inserted = builder.insert(resource, maxAmount)
-        applyContents(builder.result)
-
-        inserted
-      else
-        0L
-
-    override def extract(resource: T, maxAmount: Long, transaction: TransactionContext): Long =
-      StoragePreconditions.notBlankNotNegative(resource, maxAmount)
-
-      val contents = this.contents
-
-      val builder = StorageItemContents.Builder(contents.variant, contents.amount, capacity, getBlankResource)
-
-      if validVariant(builder.template, resource) then
-        this.updateSnapshots(transaction)
-        val extracted = builder.extract(resource, maxAmount)
-        applyContents(builder.result)
-
-        extracted
-      else
-        0L
-
-
-
-  final class TubeItemStorage(parent: StasisStorageBlockEntity, capacity: Long, context: ItemStack)
-    extends FilterableStorage[ItemVariant](parent, capacity, context):
-
-    override val contentsType: DataComponentType[StorageItemContents[ItemVariant]] = BulbusDataComponentTypes.STASIS_TUBE_CONTENTS
-
-    override def defaultContents: StorageItemContents[ItemVariant] = StorageItemContents.Item.DEFAULT
-
-    override def getBlankResource: ItemVariant = ItemVariant.blank()
-
-  final class BottleFluidStorage(parent: StasisStorageBlockEntity, capacity: Long, context: ItemStack)
-    extends FilterableStorage[FluidVariant](parent, capacity, context):
-
-    override val contentsType: DataComponentType[StorageItemContents[FluidVariant]] = BulbusDataComponentTypes.STASIS_BOTTLE_CONTENTS
-
-    override def defaultContents: StorageItemContents[FluidVariant] = StorageItemContents.Fluid.DEFAULT
-
-    override def getBlankResource: FluidVariant = FluidVariant.blank()
-
+  
+  
   trait EmptySlot[T] extends NonextractableSlot[T]:
     override def insert(resource: T, maxAmount: Long, transaction: TransactionContext): Long = 0
 
@@ -429,31 +324,30 @@ object StasisStorageBlockEntity:
   trait VoidingSlot[T] extends NonextractableSlot[T]:
     override def insert(resource: T, maxAmount: Long, transaction: TransactionContext): Long = maxAmount
 
-  object VoidingItemSlot extends VoidingSlot[ItemVariant], HasItemFilterable:
+  object VoidingItemSlot extends VoidingSlot[ItemVariant], StasisStorage[ItemVariant]:
     override protected def getBlank: ItemVariant = ItemVariant.blank()
 
-  object VoidingFluidSlot extends VoidingSlot[FluidVariant], HasFluidFilterable:
+  object VoidingFluidSlot extends VoidingSlot[FluidVariant], StasisStorage[FluidVariant]:
     override protected def getBlank: FluidVariant = FluidVariant.blank()
 
 
-  object EmptyItemSlot extends EmptySlot[ItemVariant], HasItemFilterable:
+  object EmptyItemSlot extends EmptySlot[ItemVariant], StasisStorage[ItemVariant]:
     override protected def getBlank: ItemVariant = ItemVariant.blank()
 
-  object EmptyFluidSlot extends EmptySlot[FluidVariant], HasFluidFilterable:
+  object EmptyFluidSlot extends EmptySlot[FluidVariant], StasisStorage[FluidVariant]:
     override protected def getBlank: FluidVariant = FluidVariant.blank()
 
   object StorageTests:
     def isAccepted(stack: ItemStack): Boolean =
-      isBattery(stack) || isTube(stack) || isBottle(stack) || isGarbage(stack)
+      isBattery(stack) || isStasisStorage(stack) || isGarbage(stack)
 
+    def isStasisStorage(stack: ItemStack): Boolean =
+      StasisStorage.item.find(stack, ContainerItemContext.withConstant(stack)) != null
+       || StasisStorage.fluid.find(stack, ContainerItemContext.withConstant(stack)) != null
+    
     def isBattery(stack: ItemStack): Boolean =
       stack.is(BulbusItems.stasisBattery)
-
-    def isTube(stack: ItemStack): Boolean =
-      stack.is(BulbusItems.stasisTube)
-
-    def isBottle(stack: ItemStack): Boolean =
-      stack.is(BulbusItems.stasisBottle)
+    
 
     def isGarbage(stack: ItemStack): Boolean =
       stack.is(BulbusTags.item.voidsInsertInShelf)
@@ -464,6 +358,8 @@ object StasisStorageBlockEntity:
 
   final class StasisShelfBlockEntity(pos: BlockPos, state: BlockState)
     extends ContainerStasisStorageBlockEntity(9, BulbusBlockEntities.stasisShelf, pos, state):
+    override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
+    
     override def defaultName: Component = Component.translatable(BulbusTranslationKeys.container.shelf)
 
     override def createMenu(containerId: Int, inventory: Inventory, player: Player): AbstractContainerMenu =

@@ -2,9 +2,10 @@ package gay.menkissing.bulbus.content.block.entity
 
 import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.StasisStorageMenu
+import gay.menkissing.bulbus.util.storage.StorageSlotinator
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidStorage, FluidVariant}
-import net.fabricmc.fabric.api.transfer.v1.item.{ItemStorage, ItemVariant}
+import net.fabricmc.fabric.api.transfer.v1.item.{ContainerStorage, ItemStorage, ItemVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.{SlottedStorage, Storage, StoragePreconditions, StorageView, TransferVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage, SingleSlotStorage}
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
@@ -30,6 +31,8 @@ class StasisWormBlockEntity(pos: BlockPos, state: BlockState)
 
   override val itemStorage: SlottedStorage[ItemVariant] = StasisWormBlockEntity.WormItemStorages(this)
   override val fluidStorage: SlottedStorage[FluidVariant] = StasisWormBlockEntity.WormFluidStorages(this)
+
+  override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
 
   def withLock[T](block: => T): T =
     isLocked = true
@@ -66,9 +69,9 @@ object StasisWormBlockEntity:
         None
       else
         val nextPos = parent.getNextPos
-        Option(lookup.find(parent.getLevel, nextPos, parent.getFacing.getOpposite)).flatMap:
-          case slotted: SlottedStorage[T] => Some(slotted)
-          case _ => None
+        Option(lookup.find(parent.getLevel, nextPos, parent.getFacing.getOpposite)).map:
+          case slotted: SlottedStorage[T] => slotted
+          case evil => StorageSlotinator[T](evil)
 
     def withNext[R](f: SlottedStorage[T] => R): Option[R] =
       parent.withLock(getNext.map(f))
