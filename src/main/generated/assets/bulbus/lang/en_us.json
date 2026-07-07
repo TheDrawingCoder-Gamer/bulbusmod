@@ -1,6 +1,8 @@
 {
   "block.bulbus.stasis_shelf": "Stasis Shelf",
+  "block.bulbus.stasis_worm": "Stasis Worm",
   "container.bulbus.stasis_shelf": "Stasis Shelf",
+  "container.bulbus.stasis_worm": "Stasis Worm",
   "creative_tab.bulbus": "Bulbus",
   "item.bulbus.holding_bag": "Holding Bag",
   "item.bulbus.stasis_battery": "Stasis Battery",

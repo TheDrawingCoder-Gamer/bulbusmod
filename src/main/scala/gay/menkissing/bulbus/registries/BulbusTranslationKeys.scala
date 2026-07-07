@@ -20,7 +20,7 @@ object BulbusTranslationKeys:
       keyFor(id)
 
     val shelf: String = keyFor(BulbusItems.stasisShelf)
-    val worm: String = "container.bulbus.stasis_worm"
+    val worm: String = keyFor(BulbusItems.stasisWorm)
 
   def tooltipFor(item: Item, tooltip: String): String =
     item.getDescriptionId + ".tooltip." + tooltip

@@ -13,3 +13,4 @@ import java.util.concurrent.CompletableFuture
 class BulbusLootTableProvider(output: FabricPackOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricBlockLootSubProvider(output, lookup):
   override def generate(): Unit =
     dropSelf(BulbusBlocks.stasisShelf)
+    dropSelf(BulbusBlocks.stasisWorm)

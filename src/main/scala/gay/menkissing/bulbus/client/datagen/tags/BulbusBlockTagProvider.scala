@@ -12,3 +12,4 @@ class BulbusBlockTagProvider(output: FabricPackOutput, lookup: CompletableFuture
   override def addTags(registries: HolderLookup.Provider): Unit =
     valueLookupBuilder(BlockTags.MINEABLE_WITH_AXE)
       .add(BulbusBlocks.stasisShelf)
+      .add(BulbusBlocks.stasisWorm)
