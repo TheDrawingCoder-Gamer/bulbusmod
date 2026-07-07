@@ -29,6 +29,11 @@ class StorageSlotinator[T](protected val inner: Storage[T]) extends SlottedStora
               .map(it => StorageSlotinator.SingleSlotinator[T](inner, it))
               .getOrElse(throw new IndexOutOfBoundsException("Slot " + slot + " is out of bounds of this wrapped storage"))
 
+  override def getSlots: util.List[SingleSlotStorage[T]] =
+    iterator().asScala.map: it =>
+      StorageSlotinator.SingleSlotinator[T](inner, it)
+    .toVector.asJava
+
 object StorageSlotinator:
   class SingleSlotinator[T](protected val inner: Storage[T], protected val view: StorageView[T])
     extends SingleSlotStorage[T]:
