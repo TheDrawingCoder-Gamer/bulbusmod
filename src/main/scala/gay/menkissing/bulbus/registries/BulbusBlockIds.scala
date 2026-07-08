@@ -1,7 +1,9 @@
 package gay.menkissing.bulbus.registries
 
 import gay.menkissing.bulbus.BulbusMod
+import net.minecraft.resources.Identifier
 
 object BulbusBlockIds:
-  val stasisShelf = BulbusMod.locate("stasis_shelf")
-  val stasisWorm = BulbusMod.locate("stasis_worm")
+  val stasisShelf: Identifier = BulbusMod.locate("stasis_shelf")
+  val stasisWorm: Identifier = BulbusMod.locate("stasis_worm")
+  val stasisAccessor: Identifier = BulbusMod.locate("stasis_accessor")

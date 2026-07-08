@@ -24,6 +24,7 @@ import org.joml.{Matrix4f, Vector4f}
 import java.util.Optional
 import java.util as ju
 import BulbusModelGenerator.*
+import gay.menkissing.bulbus.BulbusMod
 
 class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider(output):
   def barrelLikeModels(block: Block, blockModelGenerators: BlockModelGenerators): (Identifier, Identifier) =
@@ -36,6 +37,11 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
     (closedModel, openModel)
 
   override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
+    val customAccessorModel = ModelLocationUtils.getModelLocation(BulbusBlocks.stasisAccessor)
+    blockModelGenerators.blockStateOutput.accept:
+      BlockModelGenerators.createSimpleBlock(BulbusBlocks.stasisAccessor, BlockModelGenerators.plainVariant(customAccessorModel))
+    blockModelGenerators.registerSimpleItemModel(BulbusBlocks.stasisAccessor, customAccessorModel)
+
     val (closedShelf, openShelf) = barrelLikeModels(BulbusBlocks.stasisShelf, blockModelGenerators)
     // somehow made this more complex between versions, thanks mojang
     blockModelGenerators.blockStateOutput.accept:

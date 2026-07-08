@@ -74,6 +74,8 @@ object BulbusItems:
 
   val stasisWorm: Item = registerBlock(BulbusBlocks.stasisWorm)
 
+  val stasisAccessor: Item = registerBlock(BulbusBlocks.stasisAccessor)
+
   val bulbusTab: CreativeModeTab =
     FabricCreativeModeTab.builder()
                          .icon(() => ItemStack(stasisBottle))
@@ -86,6 +88,7 @@ object BulbusItems:
                            output.accept(toolContainer)
                            output.accept(stasisShelf)
                            output.accept(stasisWorm)
+                           output.accept(stasisAccessor)
                          .build()
 
 

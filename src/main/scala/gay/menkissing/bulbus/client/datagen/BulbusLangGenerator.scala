@@ -28,6 +28,8 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
     translationBuilder.add(BulbusItems.stasisShelf, "Stasis Shelf")
     
     translationBuilder.add(BulbusItems.stasisWorm, "Stasis Worm")
+    
+    translationBuilder.add(BulbusItems.stasisAccessor, "Stasis Accessor")
 
     translationBuilder.add(BulbusTranslationKeys.tab, "Bulbus")
     translationBuilder.add(BulbusTranslationKeys.container.shelf, "Stasis Shelf")

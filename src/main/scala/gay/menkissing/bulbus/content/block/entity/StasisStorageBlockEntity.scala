@@ -339,7 +339,7 @@ object StasisStorageBlockEntity:
 
   object StorageTests:
     def isAccepted(stack: ItemStack): Boolean =
-      isBattery(stack) || isStasisStorage(stack) || isGarbage(stack)
+      isBattery(stack) || isGarbage(stack) || isStasisStorage(stack)
 
     def isStasisStorage(stack: ItemStack): Boolean =
       StasisStorage.item.find(stack, ContainerItemContext.withConstant(stack)) != null

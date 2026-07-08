@@ -1,6 +1,6 @@
 package gay.menkissing.bulbus.registries
 
-import gay.menkissing.bulbus.content.block.StasisStorageBlock
+import gay.menkissing.bulbus.content.block.{StasisAccessorBlock, StasisStorageBlock}
 import gay.menkissing.bulbus.content.block.StasisStorageBlock.StasisWormBlock
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.{BuiltInRegistries, Registries}
@@ -15,7 +15,7 @@ object BulbusBlocks:
   
   val stasisShelf: Block = register(BulbusBlockIds.stasisShelf, StasisStorageBlock.StasisShelfBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(1.5f))
   val stasisWorm: Block = register(BulbusBlockIds.stasisWorm, StasisWormBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.GRASS).strength(1.5f))
-  
+  val stasisAccessor: Block = register(BulbusBlockIds.stasisAccessor, StasisAccessorBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(1.5f))
   
   def init(): Unit = ()
 
