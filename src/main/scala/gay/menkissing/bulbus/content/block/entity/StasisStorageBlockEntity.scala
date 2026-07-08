@@ -19,7 +19,7 @@ import net.minecraft.sounds.{SoundEvent, SoundEvents, SoundSource}
 import net.minecraft.world.entity.{ContainerUser, LivingEntity}
 import net.minecraft.world.entity.player.{Inventory, Player}
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.{Container, ContainerHelper, Containers, MenuProvider}
+import net.minecraft.world.{Clearable, Container, ContainerHelper, Containers, MenuProvider}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType, ContainerOpenersCounter}
@@ -32,7 +32,7 @@ import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
 
 abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEntityType[? <: StasisStorageBlockEntity], pos: BlockPos, state: BlockState)
-  extends BlockEntity(baseEntity, pos, state):
+  extends BlockEntity(baseEntity, pos, state), Clearable:
 
   protected val items: NonNullList[ItemStack] = NonNullList.withSize(capacity, ItemStack.EMPTY)
   protected var lastInteractedSlot: Int = -1
@@ -50,6 +50,9 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
     if level != null then
       StasisStorageBlockEntity.dropContents(getLevel, pos, this)
 
+  // implementing clearable fixes some mods
+  // on 1.21 i specifically implemented this to fix aeronautics, but any mod that
+  // wants to remove this entity from the world without it breaking can do this
   def clearContent(): Unit =
     (0 until capacity).foreach(StorageManager.removeSlot)
     items.clear()
@@ -86,6 +89,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
   override protected def loadAdditional(input: ValueInput): Unit =
     super.loadAdditional(input)
+    this.clearContent()
     ContainerHelper.loadAllItems(input, items)
     (0 until capacity).foreach(it => updateSlot(it, input.lookup()))
     loadItemFilters(input)

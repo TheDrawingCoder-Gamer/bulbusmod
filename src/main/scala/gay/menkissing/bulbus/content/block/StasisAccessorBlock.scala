@@ -2,13 +2,14 @@ package gay.menkissing.bulbus.content.block
 
 import com.mojang.serialization.MapCodec
 import gay.menkissing.bulbus.content.block.entity.{StasisAccessorBlockEntity, StasisStorageBlockEntity}
+import gay.menkissing.bulbus.registries.BulbusBlockEntities
 import net.minecraft.core.BlockPos
 import net.minecraft.world.{Containers, InteractionHand, InteractionResult}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.{BaseEntityBlock, Block}
-import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState}
 import net.minecraft.world.phys.BlockHitResult
 import org.slf4j.{Logger, LoggerFactory}
@@ -54,6 +55,12 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
           else
             InteractionResult.FAIL
         case _ => InteractionResult.PASS
+
+  override def getTicker[T <: BlockEntity](level: Level, blockState: BlockState, `type`: BlockEntityType[T]): BlockEntityTicker[T] | Null =
+    if level.isClientSide then
+      BaseEntityBlock.createTickerHelper(`type`, BulbusBlockEntities.stasisAccessor, StasisAccessorBlockEntity.ClientTicker)
+    else
+      null
 
 object StasisAccessorBlock:
   val logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlock])

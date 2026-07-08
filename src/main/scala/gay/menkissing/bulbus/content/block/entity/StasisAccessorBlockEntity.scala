@@ -24,6 +24,7 @@ import net.minecraft.world.entity.ItemOwner
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.entity.BlockEntityTicker
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.storage.TagValueOutput
 import net.minecraft.world.phys.Vec3
@@ -34,6 +35,7 @@ import scala.util.Using
 class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends StasisStorageBlockEntity(1, BulbusBlockEntities.stasisAccessor, pos, state):
   override val containerView: Container = new ContainerForStasisStorage
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
+  protected var spin: Float = 0
 
   def getStoredItem: ItemStack =
     items.get(0)
@@ -54,6 +56,13 @@ class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends Stasis
 object StasisAccessorBlockEntity:
   val Logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlockEntity])
 
+  // client
+  object ClientTicker extends BlockEntityTicker[StasisAccessorBlockEntity]:
+    val spinDegrees: Float = 1.5f
+
+    override def tick(level: Level, pos: BlockPos, state: BlockState, entity: StasisAccessorBlockEntity): Unit =
+      entity.spin += spinDegrees
+
   @Environment(EnvType.CLIENT)
   final class StasisAccessorBlockEntityRenderState extends BlockEntityRenderState:
     var storedItem: Option[ItemStackRenderState] = None
@@ -71,11 +80,11 @@ object StasisAccessorBlockEntity:
     override def extractRenderState(blockEntity: StasisAccessorBlockEntity, state: StasisAccessorBlockEntityRenderState, partialTicks: Float, cameraPosition: Vec3, breakProgress: ModelFeatureRenderer.CrumblingOverlay): Unit =
       super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress)
       val stack = blockEntity.getStoredItem
+      state.spin = Mth.rotLerp(partialTicks, blockEntity.spin, blockEntity.spin + ClientTicker.spinDegrees)
       if !stack.isEmpty then
         val itemStackRenderState = new ItemStackRenderState
         itemModelResolver.updateForTopItem(itemStackRenderState, stack, ItemDisplayContext.GROUND, blockEntity.getLevel, null, ItemClusterRenderState.getSeedForItemStack(stack))
         state.storedItem = Some(itemStackRenderState)
-        // todo: spin
       else
         state.storedItem = None
 
