@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.{BaseEntityBlock, Block}
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState}
 import net.minecraft.world.phys.BlockHitResult
+import org.slf4j.{Logger, LoggerFactory}
 
 class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBlock(props):
   override def codec(): MapCodec[? <: StasisAccessorBlock] = StasisAccessorBlock.accessorCodec
@@ -27,6 +28,7 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
         case bse: StasisAccessorBlockEntity =>
           if !bse.containerView.getItem(0).isEmpty then
             val result = bse.containerView.removeItem(0, 1)
+            bse.setChanged()
             if !player.addItem(result) then
               Containers.dropItemStack(level, pos.getX, pos.getY + 1.2f, pos.getZ, result)
 
@@ -46,6 +48,7 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
         case bse: StasisAccessorBlockEntity =>
           if bse.containerView.getItem(0).isEmpty && StasisStorageBlockEntity.StorageTests.isAccepted(itemStack) then
             bse.containerView.setItem(0, itemStack.copyWithCount(1))
+            bse.setChanged()
             itemStack.shrink(1)
             InteractionResult.SUCCESS
           else
@@ -53,5 +56,6 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
         case _ => InteractionResult.PASS
 
 object StasisAccessorBlock:
+  val logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlock])
 
   val accessorCodec: MapCodec[StasisAccessorBlock] = BlockBehaviour.simpleCodec(StasisAccessorBlock.apply)

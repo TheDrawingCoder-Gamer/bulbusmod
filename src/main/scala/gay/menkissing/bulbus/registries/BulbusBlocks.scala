@@ -15,7 +15,7 @@ object BulbusBlocks:
   
   val stasisShelf: Block = register(BulbusBlockIds.stasisShelf, StasisStorageBlock.StasisShelfBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(1.5f))
   val stasisWorm: Block = register(BulbusBlockIds.stasisWorm, StasisWormBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.GRASS).strength(1.5f))
-  val stasisAccessor: Block = register(BulbusBlockIds.stasisAccessor, StasisAccessorBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(1.5f))
+  val stasisAccessor: Block = register(BulbusBlockIds.stasisAccessor, StasisAccessorBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(1.5f).noOcclusion())
   
   def init(): Unit = ()
 

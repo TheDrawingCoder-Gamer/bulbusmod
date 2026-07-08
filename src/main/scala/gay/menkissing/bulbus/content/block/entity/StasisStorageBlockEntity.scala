@@ -57,7 +57,8 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   def isEmpty: Boolean =
     items.stream().allMatch(_.isEmpty)
 
-  def removeItem(slot: Int, amount: Int): ItemStack =
+  // protected: do this via the containerView
+  protected def removeItem(slot: Int, amount: Int): ItemStack =
     val stack = this.items.get(slot)
     val newStack = stack.copyWithCount(stack.getCount - amount)
     this.items.set(slot, newStack)
@@ -65,7 +66,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
     stack
 
-  def setItem(slot: Int, stack: ItemStack): Unit =
+  protected def setItem(slot: Int, stack: ItemStack): Unit =
     if StasisStorageBlockEntity.StorageTests.isAccepted(stack) then
       this.items.set(slot, stack)
       this.updateSlot(slot, getLevel.registryAccess())
@@ -141,6 +142,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
     override def clearContent(): Unit =
       items.clear()
       (0 until capacity).foreach(StorageManager.removeSlot)
+      setChanged()
 
     override def getItem(slot: Int): ItemStack =
       items.get(slot)
@@ -148,7 +150,9 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
     override def isEmpty: Boolean = parent.isEmpty
 
     override def removeItem(slot: Int, count: Int): ItemStack =
-      parent.removeItem(slot, count)
+      val r = parent.removeItem(slot, count)
+      setChanged()
+      r
 
     override def removeItemNoUpdate(slot: Int): ItemStack =
       parent.removeItem(slot, 1)
@@ -158,6 +162,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
     override def setItem(slot: Int, itemStack: ItemStack): Unit =
       parent.setItem(slot, itemStack)
+      setChanged()
 
     override def stillValid(player: Player): Boolean = Container.stillValidBlockEntity(parent, player)
   
