@@ -44,3 +44,10 @@ object BulbusTranslationKeys:
 
       def showCount(amount: Long, max: Long, stacksSize: String): Component =
         Component.translatable(count, amount, max, stacksSize)
+  
+  object knowledgeStorage:
+    object tooltip:
+      val count: String = tooltipFor(BulbusItems.knowledgeStorage, "count")
+      
+      def showCount(amount: Long, max: Long): Component =
+        Component.translatable(count, amount.toString, max.toString)

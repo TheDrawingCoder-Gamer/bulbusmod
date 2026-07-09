@@ -114,6 +114,7 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
     itemModelGenerators.generateFlatItem(BulbusItems.stasisBattery, ModelTemplates.FLAT_ITEM)
     itemModelGenerators.generateFlatItem(BulbusItems.toolContainer, ModelTemplates.FLAT_ITEM)
     itemModelGenerators.generateFlatItem(BulbusItems.holdingBag, ModelTemplates.FLAT_ITEM)
+    itemModelGenerators.generateFlatItem(BulbusItems.knowledgeStorage, ModelTemplates.FLAT_ITEM)
 
 
 object BulbusModelGenerator:

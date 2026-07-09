@@ -2,7 +2,7 @@ package gay.menkissing.bulbus.client.content
 
 import gay.menkissing.bulbus.client.infra.TooltipProviderFor
 import gay.menkissing.bulbus.components.StorageItemContents
-import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem}
+import gay.menkissing.bulbus.content.item.{KnowledgeStorageItem, StasisBottleItem, StasisTubeItem}
 import gay.menkissing.bulbus.registries.{BulbusDataComponentTypes, BulbusTranslationKeys}
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidVariant, FluidVariantAttributes}
@@ -34,6 +34,12 @@ object TooltipProviders:
         consumer(BulbusTranslationKeys.stasisTube.tooltip.showCount(self.amount, max, totalStacks))
         consumer(contained.getHoverName)
 
+  val xpContentProvider: TooltipProviderFor[Long] =
+    (self, tooltip, consumer, kind, getter) =>
+      val max = KnowledgeStorageItem.getMax(tooltip.registries(), getter)
+      consumer(BulbusTranslationKeys.knowledgeStorage.tooltip.showCount(self, max))
+  
   def register(): Unit =
     TooltipProviderFor.register(BulbusDataComponentTypes.STASIS_BOTTLE_CONTENTS)(stasisContentProvider)
     TooltipProviderFor.register(BulbusDataComponentTypes.STASIS_TUBE_CONTENTS)(stasisTubeContentProvider)
+    TooltipProviderFor.register(BulbusDataComponentTypes.KNOWLEDGE_STORAGE_CONTENTS)(xpContentProvider)

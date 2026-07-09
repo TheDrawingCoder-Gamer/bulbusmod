@@ -1,8 +1,10 @@
 package gay.menkissing.bulbus.registries
 
 import gay.menkissing.bulbus.BulbusMod
+import gay.menkissing.bulbus.api.XPStorage
 import gay.menkissing.bulbus.components.StorageItemContents
-import gay.menkissing.bulbus.content.item.{HoldingBagItem, StasisBottleItem, StasisTubeItem, ToolContainerItem}
+import gay.menkissing.bulbus.content.item.{HoldingBagItem, KnowledgeStorageItem, StasisBottleItem, StasisTubeItem, ToolContainerItem}
+import gay.menkissing.bulbus.infra.lookup.base.SingleTypeStorageOfLong
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage
@@ -69,6 +71,15 @@ object BulbusItems:
         .stacksTo(1),
     ToolContainerItem.apply
   )
+  
+  val knowledgeStorage: Item = register(
+    "knowledge_storage",
+    Item.Properties()
+        .component(BulbusDataComponentTypes.KNOWLEDGE_STORAGE_CONTENTS, 0)
+        .enchantable(5)
+        .stacksTo(1),
+    KnowledgeStorageItem.apply
+  )
 
   val stasisShelf: Item = registerBlock(BulbusBlocks.stasisShelf)
 
@@ -86,6 +97,8 @@ object BulbusItems:
                            output.accept(stasisBattery)
                            output.accept(holdingBag)
                            output.accept(toolContainer)
+                           output.accept(knowledgeStorage)
+                           
                            output.accept(stasisShelf)
                            output.accept(stasisWorm)
                            output.accept(stasisAccessor)
@@ -103,4 +116,9 @@ object BulbusItems:
     ItemStorage.ITEM.registerForItems(
       (stack, c) => StasisTubeItem.StasisTubeStorage(c, StasisTubeItem.getMaxEvil(stack)),
       stasisTube
+    )
+    
+    XPStorage.ITEM.registerForItems(
+      (stack, c) => SingleTypeStorageOfLong(BulbusDataComponentTypes.KNOWLEDGE_STORAGE_CONTENTS, c, KnowledgeStorageItem.getMaxEvil(stack)),
+      knowledgeStorage
     )

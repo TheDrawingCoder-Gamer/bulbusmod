@@ -6,6 +6,8 @@
   "container.bulbus.stasis_worm": "Stasis Worm",
   "creative_tab.bulbus": "Bulbus",
   "item.bulbus.holding_bag": "Holding Bag",
+  "item.bulbus.knowledge_storage": "Knowledge Storage",
+  "item.bulbus.knowledge_storage.tooltip.count": "%1$s / %2$d",
   "item.bulbus.stasis_battery": "Stasis Battery",
   "item.bulbus.stasis_bottle": "Stasis Bottle",
   "item.bulbus.stasis_bottle.tooltip.count_mb": "%1$s mB / %2$s buckets",

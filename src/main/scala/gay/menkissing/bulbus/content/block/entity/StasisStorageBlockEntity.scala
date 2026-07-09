@@ -337,8 +337,9 @@ object StasisStorageBlockEntity:
       isBattery(stack) || isGarbage(stack) || isStasisStorage(stack)
 
     def isStasisStorage(stack: ItemStack): Boolean =
-      StasisStorage.item.find(stack, ContainerItemContext.withConstant(stack)) != null
-       || StasisStorage.fluid.find(stack, ContainerItemContext.withConstant(stack)) != null
+      val ctx = ContainerItemContext.withConstant(stack)
+      ctx.find(StasisStorage.item) != null
+       || ctx.find(StasisStorage.fluid) != null
     
     def isBattery(stack: ItemStack): Boolean =
       stack.is(BulbusItems.stasisBattery)

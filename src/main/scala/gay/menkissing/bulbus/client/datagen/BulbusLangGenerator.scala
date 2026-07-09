@@ -31,6 +31,9 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
     
     translationBuilder.add(BulbusItems.stasisAccessor, "Stasis Accessor")
 
+    translationBuilder.add(BulbusItems.knowledgeStorage, "Knowledge Storage")
+    translationBuilder.add(BulbusTranslationKeys.knowledgeStorage.tooltip.count, "%1$s / %2$d")
+
     translationBuilder.add(BulbusTranslationKeys.tab, "Bulbus")
     translationBuilder.add(BulbusTranslationKeys.container.shelf, "Stasis Shelf")
     translationBuilder.add(BulbusTranslationKeys.container.worm, "Stasis Worm")
@@ -43,8 +46,7 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
     translationBuilder.add(BulbusSounds.stasisWormClose, "Stasis Worm closes")
     translationBuilder.add(BulbusSounds.stasisShelfOpen, "Stasis Shelf opens")
     translationBuilder.add(BulbusSounds.stasisShelfClose, "Stasis Shelf closes")
-    
+
     translationBuilder.add(BulbusTags.item.voidsInsertInShelf, "Voids inserts in Shelf")
     translationBuilder.add(BulbusTags.item.validToolTag, "Valid Tools")
     translationBuilder.add(BulbusTags.item.tubeBlacklist, "Stasis Tube Blacklist")
-    
