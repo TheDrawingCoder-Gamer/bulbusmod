@@ -1,6 +1,6 @@
 package gay.menkissing.bulbus.content.block.entity
 
-import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusTranslationKeys}
+import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusSounds, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.StasisStorageMenu
 import gay.menkissing.bulbus.util.storage.StorageSlotinator
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage,
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
+import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.player.{Inventory, Player}
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.level.block.state.BlockState
@@ -22,6 +23,9 @@ import scala.jdk.CollectionConverters.*
 class StasisWormBlockEntity(pos: BlockPos, state: BlockState)
   extends ContainerStasisStorageBlockEntity(9, BulbusBlockEntities.stasisWorm, pos, state):
   override def defaultName: Component = Component.translatable(BulbusTranslationKeys.container.worm)
+
+  override protected val openSound: SoundEvent = BulbusSounds.stasisWormOpen
+  override protected val closeSound: SoundEvent = BulbusSounds.stasisWormClose
 
   // prevent looping sadness
   var isLocked: Boolean = false

@@ -1,6 +1,6 @@
 package gay.menkissing.bulbus.client.datagen
 
-import gay.menkissing.bulbus.registries.{BulbusItems, BulbusTranslationKeys}
+import gay.menkissing.bulbus.registries.{BulbusItems, BulbusSounds, BulbusTranslationKeys}
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.core.HolderLookup
@@ -34,3 +34,12 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
     translationBuilder.add(BulbusTranslationKeys.tab, "Bulbus")
     translationBuilder.add(BulbusTranslationKeys.container.shelf, "Stasis Shelf")
     translationBuilder.add(BulbusTranslationKeys.container.worm, "Stasis Worm")
+
+    translationBuilder.add(BulbusSounds.stasisAccessorAddItem, "Stasis Accessor fills")
+    translationBuilder.add(BulbusSounds.stasisAccessorRemoveItem, "Stasis Accessor empties")
+    translationBuilder.add(BulbusSounds.stasisAccessorAddItemFail, "Stasis Accessor bonks")
+
+    translationBuilder.add(BulbusSounds.stasisWormOpen, "Stasis Worm opens")
+    translationBuilder.add(BulbusSounds.stasisWormClose, "Stasis Worm closes")
+    translationBuilder.add(BulbusSounds.stasisShelfOpen, "Stasis Shelf opens")
+    translationBuilder.add(BulbusSounds.stasisShelfClose, "Stasis Shelf closes")

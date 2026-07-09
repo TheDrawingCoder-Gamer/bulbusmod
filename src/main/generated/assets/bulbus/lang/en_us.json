@@ -15,5 +15,12 @@
   "item.bulbus.stasis_tube": "Stasis Tube",
   "item.bulbus.stasis_tube.tooltip.count": "%1$d / %2$d (%3$s stacks)",
   "item.bulbus.stasis_tube.tooltip.empty": "Empty",
-  "item.bulbus.tool_container": "Tool Container"
+  "item.bulbus.tool_container": "Tool Container",
+  "subtitles.bulbus.block.stasis_accessor.add_item": "Stasis Accessor fills",
+  "subtitles.bulbus.block.stasis_accessor.add_item_fail": "Stasis Accessor bonks",
+  "subtitles.bulbus.block.stasis_accessor.remove_item": "Stasis Accessor empties",
+  "subtitles.bulbus.block.stasis_shelf.close": "Stasis Shelf closes",
+  "subtitles.bulbus.block.stasis_shelf.open": "Stasis Shelf opens",
+  "subtitles.bulbus.block.stasis_worm.close": "Stasis Worm closes",
+  "subtitles.bulbus.block.stasis_worm.open": "Stasis Worm opens"
 }

@@ -3,7 +3,7 @@ package gay.menkissing.bulbus.content.block.entity
 import gay.menkissing.bulbus.components.StorageItemContents
 import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem}
 import gay.menkissing.bulbus.infra.lookup.StasisStorage
-import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusDataComponentTypes, BulbusItems, BulbusTags, BulbusTranslationKeys}
+import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusDataComponentTypes, BulbusItems, BulbusSounds, BulbusTags, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.{CommonStasisStorageMenu, StasisStorageMenu}
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant
@@ -222,8 +222,8 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
 abstract class PlainContainerStasisStorageBlockEntity(capacity: Int, baseEntity: BlockEntityType[? <: StasisStorageBlockEntity], pos: BlockPos, state: BlockState)
   extends StasisStorageBlockEntity(capacity, baseEntity, pos, state), MenuProvider, NameableBlockEntity:
-  protected val openSound: SoundEvent = SoundEvents.BARREL_OPEN
-  protected val closeSound: SoundEvent = SoundEvents.BARREL_CLOSE
+  protected val openSound: SoundEvent
+  protected val closeSound: SoundEvent
 
   override def getDisplayName: Component = getName
 
@@ -373,3 +373,6 @@ object StasisStorageBlockEntity:
 
     override def createMenu(containerId: Int, inventory: Inventory, player: Player): AbstractContainerMenu =
       StasisStorageMenu.server(containerId, inventory, containerView)
+
+    override protected val openSound: SoundEvent = BulbusSounds.stasisShelfOpen
+    override protected val closeSound: SoundEvent = BulbusSounds.stasisShelfClose

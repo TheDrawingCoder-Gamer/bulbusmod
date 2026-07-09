@@ -1,0 +1,65 @@
+{
+  "block.stasis_accessor.add_item": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item_frame.add_item"
+      }
+    ],
+    "subtitle": "subtitles.bulbus.block.stasis_accessor.add_item"
+  },
+  "block.stasis_accessor.add_item_fail": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.decorated_pot.insert_fail"
+      }
+    ],
+    "subtitle": "subtitles.bulbus.block.stasis_accessor.add_item_fail"
+  },
+  "block.stasis_accessor.remove_item": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:entity.item_frame.remove_item"
+      }
+    ],
+    "subtitle": "subtitles.bulbus.block.stasis_accessor.remove_item"
+  },
+  "block.stasis_shelf.close": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.barrel.close"
+      }
+    ],
+    "subtitle": "subtitles.bulbus.block.stasis_shelf.close"
+  },
+  "block.stasis_shelf.open": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.barrel.open"
+      }
+    ],
+    "subtitle": "subtitles.bulbus.block.stasis_shelf.open"
+  },
+  "block.stasis_worm.close": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.barrel.close"
+      }
+    ],
+    "subtitle": "subtitles.bulbus.block.stasis_worm.close"
+  },
+  "block.stasis_worm.open": {
+    "sounds": [
+      {
+        "type": "event",
+        "name": "minecraft:block.barrel.open"
+      }
+    ],
+    "subtitle": "subtitles.bulbus.block.stasis_worm.open"
+  }
+}

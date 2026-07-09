@@ -21,6 +21,7 @@ import net.minecraft.network.protocol.game.{ClientGamePacketListener, Clientboun
 import net.minecraft.util.{Mth, ProblemReporter}
 import net.minecraft.world.{Container, ContainerHelper}
 import net.minecraft.world.entity.ItemOwner
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.item.{ItemDisplayContext, ItemStack}
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -35,7 +36,7 @@ import scala.util.Using
 class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends StasisStorageBlockEntity(1, BulbusBlockEntities.stasisAccessor, pos, state):
   override val containerView: Container = new ContainerForStasisStorage
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
-  protected var spin: Float = 0
+  protected var ageInTicks: Int = 0
 
   def getStoredItem: ItemStack =
     items.get(0)
@@ -55,22 +56,27 @@ class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends Stasis
       output.buildResult()
 object StasisAccessorBlockEntity:
   val Logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlockEntity])
-
   // client
   object ClientTicker extends BlockEntityTicker[StasisAccessorBlockEntity]:
-    val spinDegrees: Float = 1.5f
-
     override def tick(level: Level, pos: BlockPos, state: BlockState, entity: StasisAccessorBlockEntity): Unit =
-      entity.spin += spinDegrees
+      entity.ageInTicks += 1
+      // have no clue what the correct timing would be
+      // overflow take the wheel
+      //if entity.ageInTicks >= 2000 then
+      //  entity.ageInTicks = 0
 
   @Environment(EnvType.CLIENT)
   final class StasisAccessorBlockEntityRenderState extends BlockEntityRenderState:
     var storedItem: Option[ItemStackRenderState] = None
-    var spin: Float = 0.0f
+    var ageInTicks: Float = 0.0f
 
     def clear(): Unit =
       storedItem = None
-      spin = 0.0f
+      ageInTicks = 0.0f
+
+  object StasisAccessorBlockEntityRenderer:
+    final val itemMinHoverHeight: Float = 0.0625f
+
   @Environment(EnvType.CLIENT)
   final class StasisAccessorBlockEntityRenderer(ctx: BlockEntityRendererProvider.Context) extends BlockEntityRenderer[StasisAccessorBlockEntity, StasisAccessorBlockEntityRenderState]:
     private val itemModelResolver: ItemModelResolver = ctx.itemModelResolver()
@@ -80,7 +86,7 @@ object StasisAccessorBlockEntity:
     override def extractRenderState(blockEntity: StasisAccessorBlockEntity, state: StasisAccessorBlockEntityRenderState, partialTicks: Float, cameraPosition: Vec3, breakProgress: ModelFeatureRenderer.CrumblingOverlay): Unit =
       super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress)
       val stack = blockEntity.getStoredItem
-      state.spin = Mth.rotLerp(partialTicks, blockEntity.spin, blockEntity.spin + ClientTicker.spinDegrees)
+      state.ageInTicks = blockEntity.ageInTicks.toFloat + partialTicks
       if !stack.isEmpty then
         val itemStackRenderState = new ItemStackRenderState
         itemModelResolver.updateForTopItem(itemStackRenderState, stack, ItemDisplayContext.GROUND, blockEntity.getLevel, null, ItemClusterRenderState.getSeedForItemStack(stack))
@@ -91,8 +97,14 @@ object StasisAccessorBlockEntity:
     override def submit(state: StasisAccessorBlockEntityRenderState, poseStack: PoseStack, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState): Unit =
       state.storedItem.foreach: storedItem =>
         poseStack.pushPose()
-        poseStack.translate(0.5f, 0.4f, 0.5f)
-        poseStack.mulPose(Axis.YP.rotationDegrees(state.spin))
+        val boundingBox = storedItem.getModelBoundingBox
+        val minOffsetY = -boundingBox.minY.toFloat + StasisAccessorBlockEntityRenderer.itemMinHoverHeight
+        // why does minecraft have its own sin??????
+        val bob = Mth.sin(state.ageInTicks / 10.0f + minOffsetY) * 0.05f + 0.05f
+
+        poseStack.translate(0.5f, 0.35f + bob, 0.5f)
+        val spin = ItemEntity.getSpin(state.ageInTicks, 0f)
+        poseStack.mulPose(Axis.YP.rotation(spin))
         storedItem.submit(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0)
 
         poseStack.popPose()

@@ -19,8 +19,8 @@ trait StasisStorageBlock(val capacity: Int) extends BaseEntityBlock:
 
 
   override protected def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit =
-    builder.add(BlockStateProperties.OPEN)
-
+    builder.add(BlockStateProperties.OPEN)    
+  
   override def useWithoutItem(state: BlockState, level: Level, pos: BlockPos, player: Player, hitResult: BlockHitResult): InteractionResult =
     if level.isClientSide then
       InteractionResult.SUCCESS

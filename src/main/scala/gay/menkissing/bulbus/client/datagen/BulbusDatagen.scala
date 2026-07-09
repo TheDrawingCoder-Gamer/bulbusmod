@@ -13,5 +13,6 @@ class BulbusDatagen extends DataGeneratorEntrypoint:
     pack.addProvider(BulbusItemTagProvider.apply)
     pack.addProvider(BulbusBlockTagProvider.apply)
     pack.addProvider(BulbusLootTableProvider.apply)
+    pack.addProvider(BulbusSoundGenerator.apply)
     
 
