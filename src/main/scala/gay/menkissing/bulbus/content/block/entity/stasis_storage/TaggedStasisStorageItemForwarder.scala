@@ -9,7 +9,7 @@ import com.mojang.serialization.Codec
  * @tparam D the data type to load/save
  */
 
-trait TaggedStasisStorageItemForwarder[T, S, D] extends StasisStorageItemForwarder[T, S]:  
+trait TaggedStasisStorageItemForwarder[T, S, GenericWorld, D] extends StasisStorageItemForwarder[T, S, GenericWorld]:
   def dataCodec: Codec[D]
   
   def loadData(storage: T, data: D): Unit

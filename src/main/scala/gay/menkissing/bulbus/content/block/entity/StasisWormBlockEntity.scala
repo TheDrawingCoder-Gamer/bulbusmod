@@ -39,7 +39,7 @@ class StasisWormBlockEntity(pos: BlockPos, state: BlockState)
 
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
   
-  override def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S]): S =
+  override def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S, ?]): S =
     wormForwardedStorage(forwarder.name).asInstanceOf
 
   def withLock[T](block: => T): T =

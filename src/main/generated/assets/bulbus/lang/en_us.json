@@ -9,6 +9,8 @@
   "item.bulbus.knowledge_storage": "Knowledge Storage",
   "item.bulbus.knowledge_storage.tooltip.count": "%1$s / %2$d",
   "item.bulbus.stasis_battery": "Stasis Battery",
+  "item.bulbus.stasis_battery.tooltip.count": "%1$s E / %2$s E",
+  "item.bulbus.stasis_battery.tooltip.transfer_rate": "Transfer Rate: %1$s E/t",
   "item.bulbus.stasis_bottle": "Stasis Bottle",
   "item.bulbus.stasis_bottle.tooltip.count_mb": "%1$s mB / %2$s buckets",
   "item.bulbus.stasis_bottle.tooltip.empty": "Empty",

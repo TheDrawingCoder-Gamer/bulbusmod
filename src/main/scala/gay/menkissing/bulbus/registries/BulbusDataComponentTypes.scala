@@ -25,11 +25,13 @@ object BulbusDataComponentTypes:
     "stasis_tube_contents",
     DataComponentType.builder[StorageItemContents[ItemVariant]]().persistent(StorageItemContents.Item.CODEC).networkSynchronized(StorageItemContents.Item.STREAM_CODEC).build()
   )
-  
-  val KNOWLEDGE_STORAGE_CONTENTS: DataComponentType[Long] = register(
-    "knowledge_storage_contents",
-    DataComponentType.builder[Long]().persistent(Codec.LONG.asInstanceOf).networkSynchronized(ByteBufCodecs.LONG.asInstanceOf).build()
-  )
+  def simpleLongComponent(name: String): DataComponentType[Long] =
+    register(
+      name,
+      DataComponentType.builder[Long]().persistent(Codec.LONG.asInstanceOf).networkSynchronized(ByteBufCodecs.LONG.asInstanceOf).build()
+    )
+
+  val KNOWLEDGE_STORAGE_CONTENTS: DataComponentType[Long] = simpleLongComponent("knowledge_storage_contents")
 
   def init(): Unit = ()
 

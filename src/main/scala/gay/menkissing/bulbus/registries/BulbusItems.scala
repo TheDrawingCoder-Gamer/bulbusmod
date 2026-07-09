@@ -3,7 +3,7 @@ package gay.menkissing.bulbus.registries
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.api.XPStorage
 import gay.menkissing.bulbus.components.StorageItemContents
-import gay.menkissing.bulbus.content.item.{HoldingBagItem, KnowledgeStorageItem, StasisBottleItem, StasisTubeItem, ToolContainerItem}
+import gay.menkissing.bulbus.content.item.{HoldingBagItem, KnowledgeStorageItem, StasisBatteryItem, StasisBottleItem, StasisTubeItem, ToolContainerItem}
 import gay.menkissing.bulbus.infra.lookup.base.SingleTypeStorageOfLong
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
@@ -14,6 +14,8 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.{BlockItem, CreativeModeTab, Item, ItemStack}
 import net.minecraft.world.level.block.Block
+import team.reborn.energy.api.EnergyStorage
+import team.reborn.energy.api.base.SimpleEnergyStorage
 
 object BulbusItems:
   def register[T <: Item](name: String, props: Item.Properties, itemFactory: Item.Properties => T): T =
@@ -50,12 +52,13 @@ object BulbusItems:
     StasisTubeItem.apply
   )
 
-  val stasisBattery: Item = register(
+  val stasisBattery: StasisBatteryItem = register(
     "stasis_battery",
     Item.Properties()
+        .component(EnergyStorage.ENERGY_COMPONENT, 0L)
         .enchantable(5)
         .stacksTo(1),
-    Item.apply
+    StasisBatteryItem.apply
   )
 
   val holdingBag: Item = register(
@@ -117,7 +120,7 @@ object BulbusItems:
       (stack, c) => StasisTubeItem.StasisTubeStorage(c, StasisTubeItem.getMaxEvil(stack)),
       stasisTube
     )
-    
+
     XPStorage.ITEM.registerForItems(
       (stack, c) => SingleTypeStorageOfLong(BulbusDataComponentTypes.KNOWLEDGE_STORAGE_CONTENTS, c, KnowledgeStorageItem.getMaxEvil(stack)),
       knowledgeStorage

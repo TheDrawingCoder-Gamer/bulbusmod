@@ -36,6 +36,17 @@ repositories {
             includeModule("com.kotori316", "scalable-cats-force-fabric")
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 dependencies {
@@ -46,8 +57,13 @@ dependencies {
 
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+    include api('teamreborn:energy:5.0.0')
+
     implementation('org.scala-lang:scala3-library_3:3.8.4')
     runtimeOnly("com.kotori316:scalable-cats-force-fabric:5.0.0:dev")
+
+    // for testing energy
+    runtimeOnly "maven.modrinth:techreborn:6.0.5"
 }
 
 processResources {

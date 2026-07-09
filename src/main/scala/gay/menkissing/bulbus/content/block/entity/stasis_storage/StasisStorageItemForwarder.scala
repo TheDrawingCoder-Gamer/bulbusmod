@@ -1,27 +1,34 @@
 package gay.menkissing.bulbus.content.block.entity.stasis_storage
 
+import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.api.SingleTypeStorage
 import gay.menkissing.bulbus.content.block.entity.{StasisStorageBlockEntity, StasisWormBlockEntity}
-import gay.menkissing.bulbus.infra.lookup.StasisStorage
-import gay.menkissing.bulbus.infra.lookup.base.{CombinedSingleTypeStorage, EmptySingleTypeStorage}
+import gay.menkissing.bulbus.infra.lookup.{SingleTypeStorageLike, StasisStorage}
+import gay.menkissing.bulbus.infra.lookup.base.{BulbusCombinedEnergyStorage, CombinedSingleTypeStorage, EmptySingleTypeStorage}
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage, SingleSlotStorage}
 import net.fabricmc.fabric.api.transfer.v1.storage.{SlottedStorage, Storage, StoragePreconditions, StorageView, TransferVariant}
-import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
+import net.fabricmc.fabric.api.transfer.v1.transaction.{Transaction, TransactionContext}
 import net.minecraft.core.{Direction, NonNullList}
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.ItemStack
+import team.reborn.energy.api.{EnergyStorage, EnergyStorageUtil}
 
 import java.util
+import scala.util.Using
 
 /**
  * An item forwarder abstracts over a storage that can be extracted from items
  * and end up being exposed to the world from a stasis storage.
- * @tparam T the storage that will be saved and exposed to the world
+ * @tparam Item the storage of a single item slot
+ * @tparam World The block view for the stasis storage block
+ * @tparam GenericWorld The base type of ALL storages in the block lookup
  */
-trait StasisStorageItemForwarder[T, S]:
+trait StasisStorageItemForwarder[Item, World, GenericWorld]:
+  def blockLookup: BlockApiLookup[GenericWorld, Direction | Null]
+  
   def accepts(stack: ItemStack, dummyCtx: ContainerItemContext): Boolean =
     tryLoadStorage(stack, dummyCtx).isDefined
 
@@ -31,7 +38,7 @@ trait StasisStorageItemForwarder[T, S]:
    * @param ctx the container context, for use with any ItemApiLookup calls
    * @return Either Some storage type, or None
    */
-  def tryLoadStorage(stack: ItemStack, ctx: ContainerItemContext): Option[T]
+  def tryLoadStorage(stack: ItemStack, ctx: ContainerItemContext): Option[Item]
 
   /**
    * @return The name of this forwarder
@@ -41,12 +48,12 @@ trait StasisStorageItemForwarder[T, S]:
   /**
    * @return A default storage implementation that will effectively be a no op when exposed
    */
-  def empty: T
+  def empty: Item
 
   /**
    * @return Some storage that allows insertion but deletes all items, or None if this forwarder shouldn't support that
    */
-  def voiding: Option[T] = None
+  def voiding: Option[Item] = None
 
   /**
    * Create something that can end up being submitted to some lookup api.
@@ -54,7 +61,7 @@ trait StasisStorageItemForwarder[T, S]:
    * @param slots A list of the slots storages. When passed, it will all be empty.
    * @return
    */
-  def createExposed(slots: NonNullList[T]): S
+  def createExposed(slots: NonNullList[Item]): World
 
   /**
    * Make a storage that will forward to the next block.
@@ -63,16 +70,50 @@ trait StasisStorageItemForwarder[T, S]:
    * @param parent
    * @return
    */
-  def wrapWorm(input: S, parent: StasisWormBlockEntity): S
+  def wrapWorm(input: World, parent: StasisWormBlockEntity): World
+  
+  def transferer: ForwardingTransferer[World, GenericWorld] = ForwardingTransferer.passive
 
 
 object StasisStorageItemForwarder:
-  trait SingleTypeForwarder extends StasisStorageItemForwarder[SingleTypeStorage, SingleTypeStorage]:
-    def blockLookup: BlockApiLookup[SingleTypeStorage, Direction | Null]
-    def itemLookup: ItemApiLookup[SingleTypeStorage, ContainerItemContext]
+  trait SingleTypeWormWrapHelper[T](val input: T) extends StasisWormBlockEntity.StorageHelper[T]:
+    this: T =>
+    protected def instance: SingleTypeStorageLike[T]
 
-    override def tryLoadStorage(stack: ItemStack, ctx: ContainerItemContext): Option[SingleTypeStorage] =
+    def insert(maxAmount: Long, transaction: TransactionContext): Long =
+      StoragePreconditions.notNegative(maxAmount)
+
+      val amount = instance.insert(input)(maxAmount, transaction)
+      if amount < maxAmount then
+        amount + withNext(it => instance.insert(it)(maxAmount - amount, transaction)).getOrElse(0L)
+      else
+        amount
+
+    def extract(maxAmount: Long, transaction: TransactionContext): Long =
+      StoragePreconditions.notNegative(maxAmount)
+
+      val amount = instance.extract(input)(maxAmount, transaction)
+      if amount < maxAmount then
+        amount + withNext(it => instance.extract(it)(maxAmount - amount, transaction)).getOrElse(0L)
+      else
+        amount
+
+    def getAmount: Long =
+      instance.getAmount(input) + withNext(instance.getAmount).getOrElse(0L)
+
+    def getCapacity: Long =
+      instance.getCapacity(input) + withNext(instance.getCapacity).getOrElse(0L)
+
+  trait SingleTypeLikeForwarder[T] extends StasisStorageItemForwarder[T, T, T]:
+    protected def instance: SingleTypeStorageLike[T]
+    
+    def itemLookup: ItemApiLookup[T, ContainerItemContext]
+
+    override def tryLoadStorage(stack: ItemStack, ctx: ContainerItemContext): Option[T] =
       Option(ctx.find(itemLookup))
+
+  trait SingleTypeForwarder extends SingleTypeLikeForwarder[SingleTypeStorage]:
+    override def instance: SingleTypeStorageLike[SingleTypeStorage] = SingleTypeStorageLike.forSingleTypeStorage
 
     override def empty: SingleTypeStorage = EmptySingleTypeStorage
 
@@ -80,36 +121,44 @@ object StasisStorageItemForwarder:
       CombinedSingleTypeStorage(slots)
 
     override def wrapWorm(input: SingleTypeStorage, parentIn: StasisWormBlockEntity): SingleTypeStorage =
-      new SingleTypeStorage with StasisWormBlockEntity.StorageHelper[SingleTypeStorage]:
+      new SingleTypeStorage with StasisWormBlockEntity.StorageHelper[SingleTypeStorage] with SingleTypeWormWrapHelper[SingleTypeStorage](input):
+        override def instance: SingleTypeStorageLike[SingleTypeStorage] = SingleTypeStorageLike.forSingleTypeStorage
+
         override val parent: StasisWormBlockEntity = parentIn
         override def lookup: BlockApiLookup[SingleTypeStorage, Direction | Null] = blockLookup
 
-        override def insert(maxAmount: Long, transaction: TransactionContext): Long =
-          StoragePreconditions.notNegative(maxAmount)
+  object EnergyForwarder extends SingleTypeLikeForwarder[EnergyStorage]:
+    override def blockLookup: BlockApiLookup[EnergyStorage, Direction | Null] = EnergyStorage.SIDED.asInstanceOf
 
-          val amount = input.insert(maxAmount, transaction)
-          if amount < maxAmount then
-            amount + withNext(_.insert(maxAmount - amount, transaction)).getOrElse(0L)
-          else
-            amount
+    override def itemLookup: ItemApiLookup[EnergyStorage, ContainerItemContext] = EnergyStorage.ITEM
+    
+    override def instance: SingleTypeStorageLike[EnergyStorage] = SingleTypeStorageLike.forEnergyStorage
 
-        override def extract(maxAmount: Long, transaction: TransactionContext): Long =
-          StoragePreconditions.notNegative(maxAmount)
+    override def empty: EnergyStorage = EnergyStorage.EMPTY
 
-          val amount = input.extract(maxAmount, transaction)
-          if amount < maxAmount then
-            amount + withNext(_.extract(maxAmount - amount, transaction)).getOrElse(0L)
-          else
-            amount
+    override def createExposed(slots: NonNullList[EnergyStorage]): EnergyStorage =
+      BulbusCombinedEnergyStorage(slots)
 
-        override def getAmount: Long =
-          input.getAmount + withNext(_.getAmount).getOrElse(0L)
+    override def name: Identifier = BulbusMod.locate("energy")
+    
+    override def wrapWorm(input: EnergyStorage, parentIn: StasisWormBlockEntity): EnergyStorage =
+      new EnergyStorage with StasisWormBlockEntity.StorageHelper[EnergyStorage] with SingleTypeWormWrapHelper[EnergyStorage](input):
+        override def instance: SingleTypeStorageLike[EnergyStorage] = SingleTypeStorageLike.forEnergyStorage
+        
+        override val parent: StasisWormBlockEntity = parentIn
 
-        override def getCapacity: Long =
-          input.getCapacity + withNext(_.getCapacity).getOrElse(0L)
+        override def lookup: BlockApiLookup[EnergyStorage, Direction | Null] = blockLookup
 
-  trait StasisStorageForwarderMixin[I <: TransferVariant[?]] extends TaggedStasisStorageItemForwarder[StasisStorage[I], SlottedStorage[I], I]:
-    def blockLookup: BlockApiLookup[Storage[I], Direction | Null]
+    // tech reborn energy is push based
+    override val transferer: ForwardingTransferer[EnergyStorage, EnergyStorage] =
+      (self, that) =>
+        if self.supportsExtraction() && that.supportsInsertion() then
+          Using.resource(Transaction.openOuter()): trans =>
+            EnergyStorageUtil.move(self, that, Long.MaxValue, trans)
+            trans.commit()
+        
+
+  trait StasisStorageForwarderMixin[I <: TransferVariant[?]] extends TaggedStasisStorageItemForwarder[StasisStorage[I], SlottedStorage[I], Storage[I], I]:
     def itemLookup: ItemApiLookup[StasisStorage[I], ContainerItemContext]
     def blank: I
 

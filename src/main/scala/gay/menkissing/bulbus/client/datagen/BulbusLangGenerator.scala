@@ -20,6 +20,8 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
     translationBuilder.add(BulbusTranslationKeys.stasisTube.tooltip.count, "%1$d / %2$d (%3$s stacks)")
 
     translationBuilder.add(BulbusItems.stasisBattery, "Stasis Battery")
+    translationBuilder.add(BulbusTranslationKeys.stasisBattery.tooltip.count, "%1$s E / %2$s E")
+    translationBuilder.add(BulbusTranslationKeys.stasisBattery.tooltip.transferRate, "Transfer Rate: %1$s E/t")
 
     translationBuilder.add(BulbusItems.holdingBag, "Holding Bag")
 

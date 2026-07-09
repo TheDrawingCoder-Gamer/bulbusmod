@@ -3,10 +3,10 @@ package gay.menkissing.bulbus.content.block.entity
 import com.mojang.serialization.Codec
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.components.StorageItemContents
-import gay.menkissing.bulbus.content.block.entity.stasis_storage.{StasisStorageItemForwarder, TaggedStasisStorageItemForwarder}
+import gay.menkissing.bulbus.content.block.entity.stasis_storage.{ForwardingTransferer, StasisStorageItemForwarder, TaggedStasisStorageItemForwarder}
 import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem}
-import gay.menkissing.bulbus.infra.lookup.StasisStorage
-import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusDataComponentTypes, BulbusItems, BulbusSounds, BulbusTags, BulbusTranslationKeys}
+import gay.menkissing.bulbus.infra.lookup.{SingleTypeStorageLike, StasisStorage}
+import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, BulbusDataComponentTypes, BulbusItems, BulbusSounds, BulbusTags, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.{CommonStasisStorageMenu, StasisStorageMenu}
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
@@ -28,14 +28,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.{Clearable, Container, ContainerHelper, Containers, MenuProvider}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType, ContainerOpenersCounter, ListBackedContainer}
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType, ContainerOpenersCounter, ListBackedContainer}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.storage.{ValueInput, ValueOutput}
-import net.minecraft.world.phys.Vec3
 
-import scala.jdk.CollectionConverters.*
-import scala.jdk.OptionConverters.*
 import scala.collection.mutable
 
 abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEntityType[? <: StasisStorageBlockEntity], pos: BlockPos, state: BlockState)
@@ -55,10 +52,10 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
     .toMap
 
 
-  protected def getForwardedStorages[T](forwarder: StasisStorageItemForwarder[T, ?]): NonNullList[T] =
+  protected def getForwardedStorages[T](forwarder: StasisStorageItemForwarder[T, ?, ?]): NonNullList[T] =
     forwardedStorages(forwarder.name).asInstanceOf
 
-  def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S]): S =
+  def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S, ?]): S =
     forwardedStorage(forwarder.name).asInstanceOf
 
 
@@ -94,9 +91,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
   protected def updateSlot(slot: Int): Unit =
     val stack = this.items.get(slot)
-    if StasisStorageBlockEntity.StorageTests.isBattery(stack) then
-      StorageManager.removeSlot(slot)
-    else if StasisStorageBlockEntity.StorageTests.isGarbage(stack) then
+    if StasisStorageBlockEntity.StorageTests.isGarbage(stack) then
       StorageManager.setVoidingSlot(slot)
     else if stack.isEmpty then
       StorageManager.removeSlot(slot)
@@ -123,7 +118,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   def loadForwarderData(input: ValueInput): Unit =
     input.child("fwd_data").ifPresent: it =>
       StasisStorageBlockEntity.forwarders.foreach:
-        case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?] =>
+        case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?, ?] =>
           it.childrenListOrEmpty(fwdr.name.toString).forEach: tag =>
             val j = tag.getByteOr("Slot", -1)
             if j >= 0 && j < capacity then
@@ -135,7 +130,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   def saveForwarderData(output: ValueOutput): Unit =
     val tag = output.child("fwd_data")
     StasisStorageBlockEntity.forwarders.foreach:
-      case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?] =>
+      case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?, ?] =>
         val subtag = tag.childrenList(fwdr.name.toString)
         val storage = getForwardedStorages(fwdr)
         (0 until capacity).foreach: i =>
@@ -337,7 +332,26 @@ object StasisStorageBlockEntity:
     override def name: Identifier = ForwarderIds.fluid
     override def dataCodec: Codec[FluidVariant] = FluidVariant.CODEC
 
-  val forwarders: mutable.ListBuffer[StasisStorageItemForwarder[?, ?]] = mutable.ListBuffer(ItemForwarder, FluidForwarder)
+  val forwarders: mutable.ListBuffer[StasisStorageItemForwarder[?, ?, ?]] = mutable.ListBuffer(ItemForwarder, FluidForwarder, StasisStorageItemForwarder.EnergyForwarder)
+
+  object ServerTicker extends BlockEntityTicker[StasisStorageBlockEntity]:
+    override def tick(level: Level, pos: BlockPos, state: BlockState, entity: StasisStorageBlockEntity): Unit =
+      forwarders.foreach: forwarder =>
+        // check to skip trivial case
+        if forwarder.transferer ne ForwardingTransferer.passive then
+          val self = entity.getForwardedStorage(forwarder)
+          Direction.values().foreach: dir =>
+            val newPos = pos.relative(dir)
+            if !posIsTargetOfWorm(level, newPos) then
+                val storage = forwarder.blockLookup.find(level, newPos, dir)
+                if storage != null then
+                  forwarder.transferer.transfer(self, storage)
+
+  def posIsTargetOfWorm(level: Level, pos: BlockPos): Boolean =
+    Direction.values().exists: dir =>
+      val newPos = pos.relative(dir)
+      val newState = level.getBlockState(pos)
+      newState.is(BulbusBlocks.stasisWorm) && newState.getValue(BlockStateProperties.FACING).getOpposite == dir
 
   trait NonextractableSlot[T] extends SingleSlotStorage[T], StasisStorage[T]:
     protected def getBlank: T
@@ -373,15 +387,11 @@ object StasisStorageBlockEntity:
 
   object StorageTests:
     def isAccepted(stack: ItemStack): Boolean =
-      isBattery(stack) || isGarbage(stack) || isStasisStorage(stack)
+      isGarbage(stack) || isStasisStorage(stack)
 
     def isStasisStorage(stack: ItemStack): Boolean =
       val ctx = ContainerItemContext.withConstant(stack)
       forwarders.exists(_.accepts(stack, ctx))
-    
-    def isBattery(stack: ItemStack): Boolean =
-      stack.is(BulbusItems.stasisBattery)
-    
 
     def isGarbage(stack: ItemStack): Boolean =
       stack.is(BulbusTags.item.voidsInsertInShelf)

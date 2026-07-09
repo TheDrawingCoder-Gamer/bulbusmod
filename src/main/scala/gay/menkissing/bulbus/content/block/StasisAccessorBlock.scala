@@ -82,7 +82,7 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
     if level.isClientSide then
       BaseEntityBlock.createTickerHelper(`type`, BulbusBlockEntities.stasisAccessor, StasisAccessorBlockEntity.ClientTicker)
     else
-      null
+      BaseEntityBlock.createTickerHelper(`type`, BulbusBlockEntities.stasisAccessor, StasisStorageBlockEntity.ServerTicker)
 
 object StasisAccessorBlock:
   val logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlock])

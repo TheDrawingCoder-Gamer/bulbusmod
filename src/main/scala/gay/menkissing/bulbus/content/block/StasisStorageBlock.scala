@@ -2,6 +2,7 @@ package gay.menkissing.bulbus.content.block
 
 import com.mojang.serialization.MapCodec
 import gay.menkissing.bulbus.content.block.entity.{ContainerStasisStorageBlockEntity, StasisStorageBlockEntity, StasisWormBlockEntity}
+import gay.menkissing.bulbus.registries.BulbusBlockEntities
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.RandomSource
@@ -9,14 +10,14 @@ import net.minecraft.world.{Containers, InteractionResult}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityTicker, BlockEntityType}
 import net.minecraft.world.level.block.{BarrelBlock, BaseEntityBlock, Block}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.phys.BlockHitResult
 
 trait StasisStorageBlock(val capacity: Int) extends BaseEntityBlock:
-
+  def ourEntityType: BlockEntityType[? <: StasisStorageBlockEntity]
 
   override protected def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit =
     builder.add(BlockStateProperties.OPEN)    
@@ -40,7 +41,6 @@ trait StasisStorageBlock(val capacity: Int) extends BaseEntityBlock:
     be match
       case sbe: ContainerStasisStorageBlockEntity =>
         sbe.recheckOpen()
-
 object StasisStorageBlock:
   val shelfCodec: MapCodec[StasisShelfBlock] = BlockBehaviour.simpleCodec(StasisShelfBlock.apply)
   val wormCodec: MapCodec[StasisWormBlock] = BlockBehaviour.simpleCodec(StasisWormBlock.apply)
@@ -51,10 +51,19 @@ object StasisStorageBlock:
         this.stateDefinition.any()
             .setValue(BlockStateProperties.OPEN, false)
 
+    override def ourEntityType: BlockEntityType[? <: StasisStorageBlockEntity] = BulbusBlockEntities.stasisShelf
+
     override def newBlockEntity(worldPosition: BlockPos, blockState: BlockState): BlockEntity =
       new StasisStorageBlockEntity.StasisShelfBlockEntity(worldPosition, blockState)
 
     override def codec(): MapCodec[? <: BaseEntityBlock] = shelfCodec
+
+    override def getTicker[T <: BlockEntity](level: Level, blockState: BlockState, `type`: BlockEntityType[T]): BlockEntityTicker[T] | Null =
+      if !level.isClientSide then
+        BaseEntityBlock.createTickerHelper(`type`, ourEntityType, StasisStorageBlockEntity.ServerTicker)
+      else
+        null
+
 
   class StasisWormBlock(props: BlockBehaviour.Properties) extends BaseEntityBlock(props), StasisStorageBlock(9):
     locally:
@@ -62,7 +71,9 @@ object StasisStorageBlock:
         this.stateDefinition.any()
             .setValue(BlockStateProperties.OPEN, false)
             .setValue(BlockStateProperties.FACING, Direction.NORTH)
-    
+
+    override def ourEntityType: BlockEntityType[? <: StasisStorageBlockEntity] = BulbusBlockEntities.stasisWorm
+
     override protected def createBlockStateDefinition(builder: StateDefinition.Builder[Block, BlockState]): Unit =
       super.createBlockStateDefinition(builder)
       builder.add(BlockStateProperties.FACING)
@@ -74,3 +85,9 @@ object StasisStorageBlock:
       this.defaultBlockState().setValue(BlockStateProperties.FACING, context.getNearestLookingDirection.getOpposite)
     
     override def codec(): MapCodec[? <: BaseEntityBlock] = wormCodec
+
+    override def getTicker[T <: BlockEntity](level: Level, blockState: BlockState, `type`: BlockEntityType[T]): BlockEntityTicker[T] | Null =
+      if !level.isClientSide then
+        BaseEntityBlock.createTickerHelper(`type`, ourEntityType, StasisStorageBlockEntity.ServerTicker)
+      else
+        null

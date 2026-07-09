@@ -44,7 +44,18 @@ object BulbusTranslationKeys:
 
       def showCount(amount: Long, max: Long, stacksSize: String): Component =
         Component.translatable(count, amount, max, stacksSize)
-  
+
+  object stasisBattery:
+    object tooltip:
+      val count: String = tooltipFor(BulbusItems.stasisBattery, "count")
+      val transferRate: String = tooltipFor(BulbusItems.stasisBattery, "transfer_rate")
+
+      def showCount(amount: Long, max: Long): Component =
+        Component.translatable(count, BulbusFormatting.formatMagnitude(amount.toDouble), BulbusFormatting.formatMagnitude(max.toDouble))
+
+      def showTransferRate(amount: Long): Component =
+        Component.translatable(transferRate, BulbusFormatting.formatMagnitude(amount.toDouble))
+
   object knowledgeStorage:
     object tooltip:
       val count: String = tooltipFor(BulbusItems.knowledgeStorage, "count")

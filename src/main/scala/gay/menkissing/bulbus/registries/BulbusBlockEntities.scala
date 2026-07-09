@@ -2,6 +2,7 @@ package gay.menkissing.bulbus.registries
 
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.content.block.entity.StasisStorageBlockEntity.StasisShelfBlockEntity
+import gay.menkissing.bulbus.content.block.entity.stasis_storage.StasisStorageItemForwarder
 import gay.menkissing.bulbus.content.block.entity.{StasisAccessorBlockEntity, StasisStorageBlockEntity, StasisWormBlockEntity}
 import gay.menkissing.bulbus.util.LookupUtil.*
 import net.fabricmc.fabric.api.`object`.builder.v1.block.entity.FabricBlockEntityTypeBuilder
@@ -13,6 +14,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
+import team.reborn.energy.api.EnergyStorage
 
 object BulbusBlockEntities:
   def makeEntity[T <: BlockEntity](name: String, factory: FabricBlockEntityTypeBuilder.Factory[T], blocks: Block*): BlockEntityType[T] =
@@ -29,6 +31,8 @@ object BulbusBlockEntities:
     FluidStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm, stasisAccessor): (ent, _) =>
       ent.getForwardedStorage(StasisStorageBlockEntity.FluidForwarder)
 
+    EnergyStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm, stasisAccessor): (ent, _) =>
+      ent.getForwardedStorage(StasisStorageItemForwarder.EnergyForwarder)
 
     // i dont really see a need to limit insertion/extraction
     // Go nuts, kids
