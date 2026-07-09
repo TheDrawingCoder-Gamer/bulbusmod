@@ -35,8 +35,9 @@ import scala.util.Using
 
 class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends StasisStorageBlockEntity(1, BulbusBlockEntities.stasisAccessor, pos, state):
   override val containerView: Container = new ContainerForStasisStorage
-  override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
   protected var ageInTicks: Int = 0
+
+  override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
 
   def getStoredItem: ItemStack =
     items.get(0)

@@ -1,20 +1,26 @@
 package gay.menkissing.bulbus.content.block.entity
 
+import com.mojang.serialization.Codec
+import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.components.StorageItemContents
+import gay.menkissing.bulbus.content.block.entity.stasis_storage.{StasisStorageItemForwarder, TaggedStasisStorageItemForwarder}
 import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem}
 import gay.menkissing.bulbus.infra.lookup.StasisStorage
 import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusDataComponentTypes, BulbusItems, BulbusSounds, BulbusTags, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.{CommonStasisStorageMenu, StasisStorageMenu}
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant
-import net.fabricmc.fabric.api.transfer.v1.item.{ContainerStorage, ItemVariant}
-import net.fabricmc.fabric.api.transfer.v1.storage.{SlottedStorage, StoragePreconditions, TransferVariant}
+import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidStorage, FluidVariant}
+import net.fabricmc.fabric.api.transfer.v1.item.{ContainerStorage, ItemStorage, ItemVariant}
+import net.fabricmc.fabric.api.transfer.v1.storage.{SlottedStorage, Storage, StoragePreconditions, TransferVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage, SingleSlotStorage, SingleVariantItemStorage, SingleVariantStorage}
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant
 import net.minecraft.core.component.{DataComponentPatch, DataComponentType}
 import net.minecraft.core.{BlockPos, Direction, HolderLookup, NonNullList}
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.{SoundEvent, SoundEvents, SoundSource}
 import net.minecraft.world.entity.{ContainerUser, LivingEntity}
 import net.minecraft.world.entity.player.{Inventory, Player}
@@ -30,6 +36,7 @@ import net.minecraft.world.phys.Vec3
 
 import scala.jdk.CollectionConverters.*
 import scala.jdk.OptionConverters.*
+import scala.collection.mutable
 
 abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEntityType[? <: StasisStorageBlockEntity], pos: BlockPos, state: BlockState)
   extends BlockEntity(baseEntity, pos, state), Clearable:
@@ -37,14 +44,23 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   protected val items: NonNullList[ItemStack] = NonNullList.withSize(capacity, ItemStack.EMPTY)
   protected var lastInteractedSlot: Int = -1
 
-  protected val itemStorages: NonNullList[StasisStorage[ItemVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyItemSlot)
-  protected val fluidStorages: NonNullList[StasisStorage[FluidVariant]] = NonNullList.withSize(capacity, StasisStorageBlockEntity.EmptyFluidSlot)
+  protected val forwardedStorages: Map[Identifier, NonNullList[?]] =
+    StasisStorageBlockEntity.forwarders.map: fwdr =>
+      (fwdr.name, NonNullList.withSize(capacity, fwdr.empty))
+    .toMap
 
-  val itemStorage: SlottedStorage[ItemVariant] =
-    CombinedSlottedStorage(itemStorages)
+  protected val forwardedStorage: Map[Identifier, ?] =
+    StasisStorageBlockEntity.forwarders.map: fwdr =>
+      (fwdr.name, fwdr.createExposed(forwardedStorages(fwdr.name).asInstanceOf))
+    .toMap
 
-  val fluidStorage: SlottedStorage[FluidVariant] =
-    CombinedSlottedStorage(fluidStorages)
+
+  protected def getForwardedStorages[T](forwarder: StasisStorageItemForwarder[T, ?]): NonNullList[T] =
+    forwardedStorages(forwarder.name).asInstanceOf
+
+  def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S]): S =
+    forwardedStorage(forwarder.name).asInstanceOf
+
 
   override def preRemoveSideEffects(pos: BlockPos, state: BlockState): Unit =
     if level != null then
@@ -65,18 +81,18 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
     val stack = this.items.get(slot)
     val newStack = stack.copyWithCount(stack.getCount - amount)
     this.items.set(slot, newStack)
-    updateSlot(slot, getLevel.registryAccess())
+    updateSlot(slot)
 
     stack
 
   protected def setItem(slot: Int, stack: ItemStack): Unit =
     if StasisStorageBlockEntity.StorageTests.isAccepted(stack) then
       this.items.set(slot, stack)
-      this.updateSlot(slot, getLevel.registryAccess())
+      this.updateSlot(slot)
     else if stack.isEmpty then
       this.removeItem(slot, 1)
 
-  protected def updateSlot(slot: Int, registries: HolderLookup.Provider): Unit =
+  protected def updateSlot(slot: Int): Unit =
     val stack = this.items.get(slot)
     if StasisStorageBlockEntity.StorageTests.isBattery(stack) then
       StorageManager.removeSlot(slot)
@@ -89,54 +105,64 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
   override protected def loadAdditional(input: ValueInput): Unit =
     super.loadAdditional(input)
-    this.clearContent()
-    ContainerHelper.loadAllItems(input, items)
-    (0 until capacity).foreach(it => updateSlot(it, input.lookup()))
-    loadItemFilters(input)
-    loadFluidFilters(input)
+    if level != null && level.isClientSide then
+      this.items.clear()
+      ContainerHelper.loadAllItems(input, items)
+    else
+      this.clearContent()
+      ContainerHelper.loadAllItems(input, items)
+      (0 until capacity).foreach(it => updateSlot(it))
+      loadForwarderData(input)
+
 
   override protected def saveAdditional(output: ValueOutput): Unit =
     super.saveAdditional(output)
     ContainerHelper.saveAllItems(output, items)
-    saveItemFilters(output)
-    saveFluidFilters(output)
+    saveForwarderData(output)
 
-  def loadItemFilters(input: ValueInput): Unit =
-    input.childrenList(StasisStorageBlockEntity.tagItemFilters).ifPresent: list =>
-      list.forEach: tag =>
-        val j = tag.getByteOr("Slot", -1)
-        if j >= 0 && j < capacity then
-          tag.read("variant", ItemVariant.CODEC).ifPresent(itemStorages.get(j).setFilter)
+  def loadForwarderData(input: ValueInput): Unit =
+    input.child("fwd_data").ifPresent: it =>
+      StasisStorageBlockEntity.forwarders.foreach:
+        case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?] =>
+          it.childrenListOrEmpty(fwdr.name.toString).forEach: tag =>
+            val j = tag.getByteOr("Slot", -1)
+            if j >= 0 && j < capacity then
+              tag.read("data", fwdr.dataCodec).ifPresent: data =>
+                val storage = getForwardedStorages(fwdr).get(j)
+                fwdr.loadData(storage, data)
+        case _ => ()
 
-  def loadFluidFilters(input: ValueInput): Unit =
-    input.childrenListOrEmpty(StasisStorageBlockEntity.tagFluidFilters).forEach: tag =>
-      val j = tag.getByteOr("Slot", -1)
-      if j >= 0 && j < capacity then
-        tag.read("variant", FluidVariant.CODEC).ifPresent(fluidStorages.get(j).setFilter)
+  def saveForwarderData(output: ValueOutput): Unit =
+    val tag = output.child("fwd_data")
+    StasisStorageBlockEntity.forwarders.foreach:
+      case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?] =>
+        val subtag = tag.childrenList(fwdr.name.toString)
+        val storage = getForwardedStorages(fwdr)
+        (0 until capacity).foreach: i =>
+          fwdr.constructData(storage.get(i)).foreach: data =>
+            val child = subtag.addChild()
+            child.putByte("Slot", i.toByte)
+            child.store("data", fwdr.dataCodec, data)
 
-  def saveItemFilters(output: ValueOutput): Unit =
-    val list = output.childrenList(StasisStorageBlockEntity.tagItemFilters)
-    (0 until capacity).foreach: i =>
-      val filter = itemStorages.get(i).getFilter
-      if !filter.isBlank then
-        val tag = list.addChild()
-        tag.putByte("Slot", i.toByte)
-        tag.store("variant", ItemVariant.CODEC, filter)
+      case _ => ()
 
-  def saveFluidFilters(output: ValueOutput): Unit =
-    val list = output.childrenList(StasisStorageBlockEntity.tagFluidFilters)
-    (0 until capacity).foreach: i =>
-      val filter = fluidStorages.get(i).getFilter
-      if !filter.isBlank then
-        val tag = list.addChild()
-        tag.putByte("Slot", i.toByte)
-        tag.store("variant", FluidVariant.CODEC, filter)
 
   val containerView: Container
-  
+
   val containerStorage: ContainerStorage
+
+  val fabricContainer: Container = new FabricContainerForStasisStorage
   
+  val fabricContainerStorage: ContainerStorage = ContainerStorage.of(fabricContainer, null)
   
+
+  // dont ask
+  class FabricContainerForStasisStorage extends ListBackedContainer:
+    override def getItems: NonNullList[ItemStack] = items
+
+    override def setChanged(): Unit = StasisStorageBlockEntity.this.setChanged()
+
+    override def stillValid(player: Player): Boolean = Container.stillValidBlockEntity(StasisStorageBlockEntity.this, player)
 
   class ContainerForStasisStorage extends ListBackedContainer:
     def parent: StasisStorageBlockEntity = StasisStorageBlockEntity.this
@@ -150,60 +176,50 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
     override def acceptsItemType(itemStack: ItemStack): Boolean =
       StasisStorageBlockEntity.StorageTests.isAccepted(itemStack)
 
+    override def removeItem(slot: Int, count: Int): ItemStack =
+      val result = super.removeItem(slot, count)
+      updateSlot(slot)
+      result
+
+    override def setItemNoUpdate(slot: Int, itemStack: ItemStack): Unit =
+      val oldItem = getItem(slot)
+      super.setItemNoUpdate(slot, itemStack)
+      // only update it if we actually changed please
+      if oldItem.getItem != itemStack.getItem then
+        updateSlot(slot)
+
     override def setChanged(): Unit =
       parent.setChanged()
 
     override def stillValid(player: Player): Boolean = Container.stillValidBlockEntity(parent, player)
   
   object StorageManager:
-    object item:
-      def removeSlot(slot: Int): Unit =
-        itemStorages.set(slot, StasisStorageBlockEntity.EmptyItemSlot)
-
-      def unsetSlot(slot: Int): Unit =
-        itemStorages.get(slot).unsetFilter()
-
-      def setSlotFilter(slot: Int, variant: ItemVariant): Unit =
-        itemStorages.get(slot).setFilter(variant)
-      
-
-      def setVoidingSlot(slot: Int): Unit =
-        itemStorages.set(slot, StasisStorageBlockEntity.VoidingItemSlot)
-
-    object fluid:
-      def removeSlot(slot: Int): Unit =
-        fluidStorages.set(slot, StasisStorageBlockEntity.EmptyFluidSlot)
-
-      def unsetSlot(slot: Int): Unit =
-        fluidStorages.get(slot).unsetFilter()
-
-      def setSlotFilter(slot: Int, variant: FluidVariant): Unit =
-        fluidStorages.get(slot).setFilter(variant)
-
-      def setVoidingSlot(slot: Int): Unit =
-        fluidStorages.set(slot, StasisStorageBlockEntity.VoidingFluidSlot)
-
     def removeSlot(slot: Int): Unit =
-      item.removeSlot(slot)
-      fluid.removeSlot(slot)
+      StasisStorageBlockEntity.forwarders.foreach: fwdr =>
+        val storages = forwardedStorages(fwdr.name)
+        storages.set(slot, fwdr.empty.asInstanceOf)
       
     def loadStorageSlot(slot: Int): Unit =
       val stack = items.get(slot)
-      val ctx = ContainerItemContext.ofSingleSlot(containerStorage.getSlot(slot))
+      val ctx = ContainerItemContext.ofSingleSlot(fabricContainerStorage.getSlot(slot))
       removeSlot(slot)
-      StasisStorage.item.find(stack, ctx) match
-        case null => ()
-        case storage => itemStorages.set(slot, storage)
-      StasisStorage.fluid.find(stack, ctx) match
-        case null => ()
-        case storage => fluidStorages.set(slot, storage)
+      StasisStorageBlockEntity.forwarders.foreach: fwdr =>
+        val storages = forwardedStorages(fwdr.name)
+        val res = fwdr.tryLoadStorage(stack, ctx)
+        res.foreach: it =>
+          storages.set(slot, it.asInstanceOf)
           
           
       
 
     def setVoidingSlot(slot: Int): Unit =
-      item.setVoidingSlot(slot)
-      fluid.setVoidingSlot(slot)
+      StasisStorageBlockEntity.forwarders.foreach: fwdr =>
+        val storages = forwardedStorages(fwdr.name)
+        fwdr.voiding match
+          case Some(voiding) =>
+            storages.set(slot, voiding.asInstanceOf)
+          case _ =>
+            storages.set(slot, fwdr.empty.asInstanceOf)
 
 abstract class PlainContainerStasisStorageBlockEntity(capacity: Int, baseEntity: BlockEntityType[? <: StasisStorageBlockEntity], pos: BlockPos, state: BlockState)
   extends StasisStorageBlockEntity(capacity, baseEntity, pos, state), MenuProvider, NameableBlockEntity:
@@ -297,8 +313,31 @@ abstract class ContainerStasisStorageBlockEntity(capacity: Int, baseEntity: Bloc
 object StasisStorageBlockEntity:
   val tagFluidFilters = "fluid_filters"
   val tagItemFilters = "item_filters"
+
+  object ForwarderIds:
+    val item: Identifier = BulbusMod.locate("item")
+    val fluid: Identifier = BulbusMod.locate("fluid")
+
   
-  
+  object ItemForwarder extends StasisStorageItemForwarder.StasisStorageForwarderMixin[ItemVariant]:
+    override def blockLookup: BlockApiLookup[Storage[ItemVariant], Direction | Null] = ItemStorage.SIDED.asInstanceOf
+    override def itemLookup: ItemApiLookup[StasisStorage[ItemVariant], ContainerItemContext] = StasisStorage.item
+    override def blank: ItemVariant = ItemVariant.blank()
+
+    override def name: Identifier = ForwarderIds.item
+    override def dataCodec: Codec[ItemVariant] = ItemVariant.CODEC
+
+  object FluidForwarder extends StasisStorageItemForwarder.StasisStorageForwarderMixin[FluidVariant]:
+    override def blockLookup: BlockApiLookup[Storage[FluidVariant], Direction | Null] = FluidStorage.SIDED.asInstanceOf
+
+    override def itemLookup: ItemApiLookup[StasisStorage[FluidVariant], ContainerItemContext] = StasisStorage.fluid
+
+    override def blank: FluidVariant = FluidVariant.blank()
+
+    override def name: Identifier = ForwarderIds.fluid
+    override def dataCodec: Codec[FluidVariant] = FluidVariant.CODEC
+
+  val forwarders: mutable.ListBuffer[StasisStorageItemForwarder[?, ?]] = mutable.ListBuffer(ItemForwarder, FluidForwarder)
 
   trait NonextractableSlot[T] extends SingleSlotStorage[T], StasisStorage[T]:
     protected def getBlank: T
@@ -338,8 +377,7 @@ object StasisStorageBlockEntity:
 
     def isStasisStorage(stack: ItemStack): Boolean =
       val ctx = ContainerItemContext.withConstant(stack)
-      ctx.find(StasisStorage.item) != null
-       || ctx.find(StasisStorage.fluid) != null
+      forwarders.exists(_.accepts(stack, ctx))
     
     def isBattery(stack: ItemStack): Boolean =
       stack.is(BulbusItems.stasisBattery)
@@ -355,7 +393,7 @@ object StasisStorageBlockEntity:
   final class StasisShelfBlockEntity(pos: BlockPos, state: BlockState)
     extends ContainerStasisStorageBlockEntity(9, BulbusBlockEntities.stasisShelf, pos, state):
     override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
-    
+
     override def defaultName: Component = Component.translatable(BulbusTranslationKeys.container.shelf)
 
     override def createMenu(containerId: Int, inventory: Inventory, player: Player): AbstractContainerMenu =

@@ -123,8 +123,10 @@ object StasisStorage:
       context.getItemVariant.getOrDefault(contentsType, defaultContents)
 
     protected def applyContents(contents: StorageItemContents[T], transaction: TransactionContext): Unit =
-      val newVariant = context.getItemVariant.withComponents(DataComponentPatch.builder().set(contentsType, contents).build())
-      context.exchange(newVariant, 1, transaction)
+      // ???
+      if !context.getItemVariant.isBlank then
+        val newVariant = context.getItemVariant.withComponents(DataComponentPatch.builder().set(contentsType, contents).build())
+        context.exchange(newVariant, 1, transaction)
 
     override def getCapacity: Long = capacity
 

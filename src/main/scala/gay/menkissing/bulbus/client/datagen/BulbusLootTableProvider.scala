@@ -14,3 +14,4 @@ class BulbusLootTableProvider(output: FabricPackOutput, lookup: CompletableFutur
   override def generate(): Unit =
     dropSelf(BulbusBlocks.stasisShelf)
     dropSelf(BulbusBlocks.stasisWorm)
+    dropSelf(BulbusBlocks.stasisAccessor)

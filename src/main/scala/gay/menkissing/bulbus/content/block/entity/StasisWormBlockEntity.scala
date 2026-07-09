@@ -1,5 +1,6 @@
 package gay.menkissing.bulbus.content.block.entity
 
+import gay.menkissing.bulbus.content.block.entity.stasis_storage.StasisStorageItemForwarder
 import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusSounds, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.StasisStorageMenu
 import gay.menkissing.bulbus.util.storage.StorageSlotinator
@@ -11,6 +12,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage,
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.world.entity.player.{Inventory, Player}
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -30,13 +32,15 @@ class StasisWormBlockEntity(pos: BlockPos, state: BlockState)
   // prevent looping sadness
   var isLocked: Boolean = false
 
-  val ourItemStorage = CombinedSlottedStorage(itemStorages)
-  val ourFluidStorage = CombinedSlottedStorage(fluidStorages)
-
-  override val itemStorage: SlottedStorage[ItemVariant] = StasisWormBlockEntity.WormItemStorages(this)
-  override val fluidStorage: SlottedStorage[FluidVariant] = StasisWormBlockEntity.WormFluidStorages(this)
+  val wormForwardedStorage: Map[Identifier, ?] =
+    StasisStorageBlockEntity.forwarders.map: fwdr =>
+      fwdr.name -> fwdr.wrapWorm(forwardedStorage(fwdr.name).asInstanceOf, this)
+    .toMap
 
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
+  
+  override def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S]): S =
+    wormForwardedStorage(forwarder.name).asInstanceOf
 
   def withLock[T](block: => T): T =
     isLocked = true
@@ -62,13 +66,25 @@ class StasisWormBlockEntity(pos: BlockPos, state: BlockState)
     StasisStorageMenu.server(containerId, inventory, containerView)
 
 object StasisWormBlockEntity:
-  trait StorageMixin[T <: TransferVariant[?]] extends SlottedStorage[T]:
-    val parent: StasisWormBlockEntity
+  trait StorageHelper[T]:
+    protected val parent: StasisWormBlockEntity
+
+    protected def lookup: BlockApiLookup[T, Direction | Null]
+
+    protected def getNext: Option[T] =
+      if parent.isLooping then
+        None
+      else
+        val nextPos = parent.getNextPos
+        Option(lookup.find(parent.getLevel, nextPos, parent.getFacing.getOpposite))
+
+    protected def withNext[R](f: T => R): Option[R] =
+      parent.withLock(getNext.map(f))
+
+  trait StorageMixin[T <: TransferVariant[?]] extends SlottedStorage[T], StorageHelper[Storage[T]]:
     def storages: SlottedStorage[T]
 
-    def lookup: BlockApiLookup[Storage[T], Direction | Null]
-
-    def getNext: Option[SlottedStorage[T]] =
+    override def getNext: Option[SlottedStorage[T]] =
       if parent.isLooping then
         None
       else
@@ -77,17 +93,17 @@ object StasisWormBlockEntity:
           case slotted: SlottedStorage[T] => slotted
           case evil => StorageSlotinator[T](evil)
 
-    def withNext[R](f: SlottedStorage[T] => R): Option[R] =
+    protected def withNextSlotted[R](f: SlottedStorage[T] => R): Option[R] =
       parent.withLock(getNext.map(f))
 
     override def getSlotCount: Int =
-      storages.getSlotCount + withNext(_.getSlotCount).getOrElse(0)
+      storages.getSlotCount + withNextSlotted(_.getSlotCount).getOrElse(0)
 
     override def getSlot(slot: Int): SingleSlotStorage[T] =
       if slot < parent.capacity then
         storages.getSlot(slot)
       else
-        withNext(_.getSlot(slot - parent.capacity)).getOrElse:
+        withNextSlotted(_.getSlot(slot - parent.capacity)).getOrElse:
           throw new IndexOutOfBoundsException("Slot " + slot + " is out of bounds for this worm")
 
     override def extract(resource: T, maxAmount: Long, transaction: TransactionContext): Long =
@@ -116,16 +132,3 @@ object StasisWormBlockEntity:
               .concat(
                 nextIterator
               ).asJava
-
-  final class WormItemStorages(override val parent: StasisWormBlockEntity) extends StorageMixin[ItemVariant]:
-    override def storages: SlottedStorage[ItemVariant] = parent.ourItemStorage
-
-    override def lookup: BlockApiLookup[Storage[ItemVariant], Direction | Null] =
-      // widen incorrect null detection
-      ItemStorage.SIDED.asInstanceOf
-
-  final class WormFluidStorages(override val parent: StasisWormBlockEntity) extends StorageMixin[FluidVariant]:
-    override def storages: SlottedStorage[FluidVariant] = parent.ourFluidStorage
-
-    override def lookup: BlockApiLookup[Storage[FluidVariant], Direction | Null] =
-      FluidStorage.SIDED.asInstanceOf
