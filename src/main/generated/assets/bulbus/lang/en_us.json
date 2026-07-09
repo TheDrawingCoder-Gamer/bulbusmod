@@ -22,5 +22,8 @@
   "subtitles.bulbus.block.stasis_shelf.close": "Stasis Shelf closes",
   "subtitles.bulbus.block.stasis_shelf.open": "Stasis Shelf opens",
   "subtitles.bulbus.block.stasis_worm.close": "Stasis Worm closes",
-  "subtitles.bulbus.block.stasis_worm.open": "Stasis Worm opens"
+  "subtitles.bulbus.block.stasis_worm.open": "Stasis Worm opens",
+  "tag.item.bulbus.tube_blacklist": "Stasis Tube Blacklist",
+  "tag.item.bulbus.valid_tools": "Valid Tools",
+  "tag.item.bulbus.voids_insert_in_shelf": "Voids inserts in Shelf"
 }

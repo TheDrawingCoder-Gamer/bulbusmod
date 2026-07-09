@@ -1,6 +1,7 @@
 {
   "values": [
     "bulbus:stasis_shelf",
-    "bulbus:stasis_worm"
+    "bulbus:stasis_worm",
+    "bulbus:stasis_accessor"
   ]
 }

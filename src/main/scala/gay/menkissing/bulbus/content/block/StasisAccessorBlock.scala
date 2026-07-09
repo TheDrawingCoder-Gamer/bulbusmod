@@ -73,10 +73,9 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
             itemStack.shrink(1)
             if !swappedWith.isEmpty then
               giveOrDrop(level, pos, player, swappedWith)
-            InteractionResult.SUCCESS
           else
             quickPlaySound(level, pos, BulbusSounds.stasisAccessorAddItemFail)
-            InteractionResult.FAIL
+          InteractionResult.SUCCESS
         case _ => InteractionResult.PASS
 
   override def getTicker[T <: BlockEntity](level: Level, blockState: BlockState, `type`: BlockEntityType[T]): BlockEntityTicker[T] | Null =

@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage,
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant
 import net.minecraft.core.component.{DataComponentPatch, DataComponentType}
-import net.minecraft.core.{BlockPos, HolderLookup, NonNullList}
+import net.minecraft.core.{BlockPos, Direction, HolderLookup, NonNullList}
 import net.minecraft.network.chat.Component
 import net.minecraft.sounds.{SoundEvent, SoundEvents, SoundSource}
 import net.minecraft.world.entity.{ContainerUser, LivingEntity}
@@ -22,7 +22,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.{Clearable, Container, ContainerHelper, Containers, MenuProvider}
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType, ContainerOpenersCounter}
+import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType, ContainerOpenersCounter, ListBackedContainer}
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.world.level.storage.{ValueInput, ValueOutput}
@@ -52,7 +52,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
   // implementing clearable fixes some mods
   // on 1.21 i specifically implemented this to fix aeronautics, but any mod that
-  // wants to remove this entity from the world without it breaking can do this
+  // wants to remove this entity from the world without it dropping its items, it can use this
   def clearContent(): Unit =
     (0 until capacity).foreach(StorageManager.removeSlot)
     items.clear()
@@ -138,35 +138,20 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   
   
 
-  class ContainerForStasisStorage extends Container:
+  class ContainerForStasisStorage extends ListBackedContainer:
     def parent: StasisStorageBlockEntity = StasisStorageBlockEntity.this
 
-    def getContainerSize: Int = capacity
+    override def getItems: NonNullList[ItemStack] = items
 
     override def clearContent(): Unit =
-      items.clear()
+      super.clearContent()
       (0 until capacity).foreach(StorageManager.removeSlot)
-      setChanged()
 
-    override def getItem(slot: Int): ItemStack =
-      items.get(slot)
-
-    override def isEmpty: Boolean = parent.isEmpty
-
-    override def removeItem(slot: Int, count: Int): ItemStack =
-      val r = parent.removeItem(slot, count)
-      setChanged()
-      r
-
-    override def removeItemNoUpdate(slot: Int): ItemStack =
-      parent.removeItem(slot, 1)
+    override def acceptsItemType(itemStack: ItemStack): Boolean =
+      StasisStorageBlockEntity.StorageTests.isAccepted(itemStack)
 
     override def setChanged(): Unit =
       parent.setChanged()
-
-    override def setItem(slot: Int, itemStack: ItemStack): Unit =
-      parent.setItem(slot, itemStack)
-      setChanged()
 
     override def stillValid(player: Player): Boolean = Container.stillValidBlockEntity(parent, player)
   
@@ -232,7 +217,8 @@ abstract class PlainContainerStasisStorageBlockEntity(capacity: Int, baseEntity:
   def defaultName: Component
 
   def playSound(blockState: BlockState, soundEvent: SoundEvent): Unit =
-    val vec3i = Vec3(1, 1, 1)
+    val direction = blockState.getValueOrElse(BlockStateProperties.FACING, Direction.UP)
+    val vec3i = direction.getUnitVec3
     val d = this.worldPosition.getX.toDouble + 0.5 + (vec3i.x / 2)
     val e = this.worldPosition.getY.toDouble + 0.5 + (vec3i.y / 2)
     val f = this.worldPosition.getZ.toDouble + 0.5 + (vec3i.z / 2)
