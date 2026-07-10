@@ -11,6 +11,19 @@ base {
     archivesName = project.archives_base_name
 }
 
+// have to do side by side to prevent copying resources????????
+sourceSets {
+    main {
+        java {
+            srcDirs = []
+        }
+
+        scala {
+            srcDirs = ['src/main/java', 'src/main/scala']
+        }
+    }
+}
+
 loom {
     accessWidenerPath = file("src/main/resources/bulbus.classtweaker")
 
@@ -97,7 +110,8 @@ java {
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
 }
-JavaCompile
+
+
 
 tasks.withType(ScalaCompile).configureEach {
     it.scalaCompileOptions.additionalParameters.add("-release:25")
