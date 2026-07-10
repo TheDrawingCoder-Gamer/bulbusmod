@@ -7,6 +7,4 @@ import java.util.concurrent.CompletableFuture
 object DatagenPrelude:
   export net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
   export net.minecraft.core.HolderLookup
-
-  type HLP = HolderLookup.Provider
-  type CHLP = CompletableFuture[HLP]
+  export java.util.concurrent.CompletableFuture

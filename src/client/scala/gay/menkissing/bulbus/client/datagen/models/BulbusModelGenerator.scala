@@ -2,18 +2,19 @@ package gay.menkissing.bulbus.client.datagen.models
 
 import com.mojang.math.{Quadrant, Transformation}
 import gay.menkissing.bulbus.client.content.itemmodels.{BottleFluidContentsModel, TubeStoredItemSpecialRenderer}
+import gay.menkissing.bulbus.client.datagen.models.BulbusModelGenerator.*
 import gay.menkissing.bulbus.registries.{BulbusBlocks, BulbusItems}
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.minecraft.client.data.models.blockstates.{MultiVariantGenerator, PropertyDispatch}
-import net.minecraft.client.data.models.model.{ItemModelUtils, ModelLocationUtils, ModelTemplate, ModelTemplates, TextureMapping, TextureSlot, TexturedModel}
+import net.minecraft.client.data.models.model.*
 import net.minecraft.client.data.models.{BlockModelGenerators, ItemModelGenerators, MultiVariant}
 import net.minecraft.client.renderer.block.dispatch.{Variant, VariantMutator}
 import net.minecraft.client.renderer.item.SelectItemModel.SwitchCase
 import net.minecraft.client.renderer.item.properties.select.DisplayContext
 import net.minecraft.client.resources.model.sprite.Material
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.Direction
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.util.random.WeightedList
 import net.minecraft.world.item.{Item, ItemDisplayContext}
@@ -21,10 +22,8 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.joml.{Matrix4f, Vector4f}
 
-import java.util.Optional
 import java.util as ju
-import BulbusModelGenerator.*
-import gay.menkissing.bulbus.BulbusMod
+import java.util.Optional
 
 class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider(output):
   def barrelLikeModels(block: Block, blockModelGenerators: BlockModelGenerators): (Identifier, Identifier) =

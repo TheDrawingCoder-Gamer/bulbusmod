@@ -3,15 +3,13 @@ package gay.menkissing.bulbus.client.content
 import gay.menkissing.bulbus.client.infra.TooltipProviderFor
 import gay.menkissing.bulbus.components.StorageItemContents
 import gay.menkissing.bulbus.content.item.{KnowledgeStorageItem, StasisBatteryItem, StasisBottleItem, StasisTubeItem}
-import gay.menkissing.bulbus.registries.{BulbusDataComponentTypes, BulbusItems, BulbusTranslationKeys}
-import net.fabricmc.api.{EnvType, Environment}
+import gay.menkissing.bulbus.registries.{BulbusDataComponentTypes, BulbusTranslationKeys}
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidVariant, FluidVariantAttributes}
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 
-@Environment(EnvType.CLIENT)
 object TooltipProviders:
   val stasisContentProvider: TooltipProviderFor[StorageItemContents[FluidVariant]] =
     (self, tooltip, consumer, kind, getter) =>

@@ -7,11 +7,9 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Item.TooltipContext
 import net.minecraft.world.item.TooltipFlag
 
-@Environment(EnvType.CLIENT)
 trait TooltipProviderFor[T]:
   def addToTooltip(self: T, tooltip: TooltipContext, textConsumer: Component => Unit, kind: TooltipFlag, components: DataComponentGetter): Unit
 
-@Environment(EnvType.CLIENT)
 object TooltipProviderFor:
   def register[T](componentKind: DataComponentType[T])(provider: TooltipProviderFor[T]): Unit =
     ItemTooltipCallback.EVENT.register((stack, context, kind, tooltip) =>

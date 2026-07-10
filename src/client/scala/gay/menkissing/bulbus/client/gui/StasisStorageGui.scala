@@ -17,4 +17,4 @@ class StasisStorageGui(menu: StasisStorageMenu, inventory: Inventory, component:
     graphics.blit(RenderPipelines.GUI_TEXTURED, StasisStorageGui.texture, i, j, 0, 0, this.imageWidth, this.imageHeight, 256, 256)
 
 object StasisStorageGui:
-  val texture = Identifier.withDefaultNamespace("textures/gui/container/dispenser.png")
+  val texture: Identifier = Identifier.withDefaultNamespace("textures/gui/container/dispenser.png")

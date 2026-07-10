@@ -5,23 +5,19 @@ import com.mojang.serialization.MapCodec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import gay.menkissing.bulbus.client.content.color.item.BottleContentsTint
 import gay.menkissing.bulbus.registries.BulbusDataComponentTypes
-import net.fabricmc.api.{EnvType, Environment}
-import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering
-import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidVariant, FluidVariantAttributes}
-import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.Sheets
-import net.minecraft.client.renderer.block.dispatch.{BlockModelRotation, ModelState}
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer
 import net.minecraft.client.renderer.item.ItemModel.BakingContext
-import net.minecraft.client.renderer.item.{CuboidItemModelWrapper, EmptyModel, ItemModel, ItemModelResolver, ItemStackRenderState, ModelRenderProperties}
+import net.minecraft.client.renderer.item.*
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.client.resources.model.ResolvableModel
-import net.minecraft.client.resources.model.cuboid.{CuboidFace, FaceBakery, ItemModelGenerator, ItemTransforms}
+import net.minecraft.client.resources.model.cuboid.{CuboidFace, FaceBakery, ItemTransforms}
 import net.minecraft.client.resources.model.geometry.{BakedQuad, QuadCollection}
-import net.minecraft.client.resources.model.sprite.{Material, SpriteId}
+import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.util.ExtraCodecs
@@ -34,7 +30,6 @@ import java.util as ju
 import scala.collection.mutable
 
 // Renders a fluid, completely filling the slot
-@Environment(EnvType.CLIENT)
 class BottleFluidContentsModel(val transform: Matrix4fc, val crop: Vector4fc, val bakingContext: ItemModel.BakingContext) extends ItemModel:
   private val cache = mutable.HashMap.empty[Fluid, ItemModel]
   private def bakeModelForFluid(fluid: Fluid): ItemModel =
@@ -85,7 +80,6 @@ class BottleFluidContentsModel(val transform: Matrix4fc, val crop: Vector4fc, va
            .update(output, item, resolver, displayContext, level, owner, seed)
 
 
-@Environment(EnvType.CLIENT)
 object BottleFluidContentsModel:
   val DEBUG_NAME = "BottleFluidContentsModel"
   
@@ -106,7 +100,6 @@ object BottleFluidContentsModel:
       else
         Sheets.cutoutItemSheet()
 
-  @Environment(EnvType.CLIENT)
   final case class Unbaked(transformation: ju.Optional[Transformation], crop: Vector4fc) extends ItemModel.Unbaked:
     override def `type`(): MapCodec[? <: ItemModel.Unbaked] = Unbaked.MAP_CODEC
 
@@ -116,7 +109,6 @@ object BottleFluidContentsModel:
 
     override def resolveDependencies(resolver: ResolvableModel.Resolver): Unit =()
 
-  @Environment(EnvType.CLIENT)
   object Unbaked:
     val MAP_CODEC: MapCodec[Unbaked] = RecordCodecBuilder.mapCodec(inst =>
       inst.group(

@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.client.datagen.v1.builder.SoundTypeBuilder.Regist
 import net.minecraft.core.HolderLookup
 import net.minecraft.sounds.{SoundEvent, SoundEvents}
 
-class BulbusSoundGenerator(output: FabricPackOutput, registriesFuture: CHLP) extends FabricSoundsProvider(output, registriesFuture):
+class BulbusSoundGenerator(output: FabricPackOutput, registriesFuture: CompletableFuture[HolderLookup.Provider]) extends FabricSoundsProvider(output, registriesFuture):
   def delegated(self: SoundEvent, that: SoundEvent)(using exporter: FabricSoundsProvider.SoundExporter): Unit =
     exporter.add(self,
       SoundTypeBuilder.of(self).sound(RegistrationBuilder.ofEvent(that))

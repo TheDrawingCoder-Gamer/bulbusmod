@@ -16,7 +16,6 @@ import org.joml.Matrix4fc
 
 import java.util.Optional
 
-@Environment(EnvType.CLIENT)
 class TubeStoredItemSpecialRenderer(val transform: Matrix4fc) extends ItemModel:
   override def update(output: ItemStackRenderState, item: ItemStack, resolver: ItemModelResolver, displayContext: ItemDisplayContext, level: ClientLevel, owner: ItemOwner, seed: Int): Unit =
     output.appendModelIdentityElement(this)
@@ -42,8 +41,7 @@ class TubeStoredItemSpecialRenderer(val transform: Matrix4fc) extends ItemModel:
           
 
 object TubeStoredItemSpecialRenderer:
-
-  @Environment(EnvType.CLIENT)
+  
   final case class Unbaked(transformation: Optional[Transformation]) extends ItemModel.Unbaked:
     override def `type`(): MapCodec[? <: ItemModel.Unbaked] = Unbaked.MAP_CODEC
 

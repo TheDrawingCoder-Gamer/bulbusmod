@@ -3,7 +3,6 @@ package gay.menkissing.bulbus.client.content.color.item
 import com.mojang.serialization.MapCodec
 import gay.menkissing.bulbus.registries.BulbusDataComponentTypes
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering
-import net.minecraft.client.Minecraft
 import net.minecraft.client.color.item.ItemTintSource
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.world.entity.LivingEntity

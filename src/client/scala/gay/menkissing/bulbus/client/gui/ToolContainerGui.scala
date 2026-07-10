@@ -20,4 +20,4 @@ class ToolContainerGui(menu: ToolContainerMenu, inventory: Inventory, component:
     graphics.blit(RenderPipelines.GUI_TEXTURED, ToolContainerGui.texture, xo, yo + ToolContainerMenu.rows * 18 + 17, 0f, 126f, this.imageWidth, 96, 256, 256)
     
 object ToolContainerGui:
-  val texture = Identifier.withDefaultNamespace("textures/gui/container/generic_54.png")
+  val texture: Identifier = Identifier.withDefaultNamespace("textures/gui/container/generic_54.png")

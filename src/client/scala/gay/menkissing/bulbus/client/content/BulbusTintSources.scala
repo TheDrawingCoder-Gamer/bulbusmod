@@ -2,7 +2,7 @@ package gay.menkissing.bulbus.client.content
 
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.client.content.color.item.BottleContentsTint
-import net.minecraft.client.color.item.{ItemTintSource, ItemTintSources}
+import net.minecraft.client.color.item.ItemTintSources
 
 object BulbusTintSources:
   def register(): Unit =
