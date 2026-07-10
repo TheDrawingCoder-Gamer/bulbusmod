@@ -1,7 +1,7 @@
 package gay.menkissing.bulbus.content.block.entity
 
 import gay.menkissing.bulbus.content.block.entity.stasis_storage.StasisStorageItemForwarder
-import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusSounds, BulbusTranslationKeys}
+import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBuiltInRegistries, BulbusSounds, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.StasisStorageMenu
 import gay.menkissing.bulbus.util.storage.StorageSlotinator
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
@@ -33,14 +33,14 @@ class StasisWormBlockEntity(pos: BlockPos, state: BlockState)
   var isLocked: Boolean = false
 
   val wormForwardedStorage: Map[Identifier, ?] =
-    StasisStorageItemForwarder.registry.entrySet().asScala.iterator.map: entry =>
+    BulbusBuiltInRegistries.itemForwarder.entrySet().asScala.iterator.map: entry =>
       entry.getKey.identifier() -> entry.getValue.wrapWorm(forwardedStorage(entry.getKey.identifier()).asInstanceOf, this)
     .toMap
 
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
   
   override def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S, ?]): S =
-    val id = StasisStorageItemForwarder.registry.getKey(forwarder)
+    val id = BulbusBuiltInRegistries.itemForwarder.getKey(forwarder)
     wormForwardedStorage(id).asInstanceOf[S]
 
   def withLock[T](block: => T): T =

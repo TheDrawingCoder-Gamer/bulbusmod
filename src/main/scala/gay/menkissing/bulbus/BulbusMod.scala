@@ -2,7 +2,7 @@ package gay.menkissing.bulbus
 
 import gay.menkissing.bulbus.content.block.entity.stasis_storage.StasisStorageItemForwarder
 import gay.menkissing.bulbus.infra.lookup.StasisStorage
-import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, BulbusDataComponentTypes, BulbusItems, BulbusScreens, BulbusSounds}
+import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, BulbusBuiltInRegistries, BulbusDataComponentTypes, BulbusItemForwarders, BulbusItems, BulbusRegistries, BulbusScreens, BulbusSounds}
 import net.fabricmc.api.ModInitializer
 import net.minecraft.resources.Identifier
 
@@ -13,7 +13,8 @@ class BulbusMod extends ModInitializer:
     BulbusBlockEntities.init()
     BulbusItems.init()
     StasisStorage.init()
-    StasisStorageItemForwarder.init()
+    BulbusBuiltInRegistries.init()
+    BulbusItemForwarders.init()
     BulbusScreens.init()
     BulbusSounds.init()
 

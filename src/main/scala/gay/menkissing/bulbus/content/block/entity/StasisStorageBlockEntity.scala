@@ -6,7 +6,7 @@ import gay.menkissing.bulbus.components.StorageItemContents
 import gay.menkissing.bulbus.content.block.entity.stasis_storage.{ForwardingTransferer, StasisStorageItemForwarder, TaggedStasisStorageItemForwarder}
 import gay.menkissing.bulbus.content.item.{StasisBottleItem, StasisTubeItem}
 import gay.menkissing.bulbus.infra.lookup.{SingleTypeStorageLike, StasisStorage}
-import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, BulbusDataComponentTypes, BulbusItems, BulbusSounds, BulbusTags, BulbusTranslationKeys}
+import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, BulbusBuiltInRegistries, BulbusDataComponentTypes, BulbusItems, BulbusSounds, BulbusTags, BulbusTranslationKeys}
 import gay.menkissing.bulbus.screen.{CommonStasisStorageMenu, StasisStorageMenu}
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
@@ -44,22 +44,22 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   protected var lastInteractedSlot: Int = -1
 
   protected val forwardedStorages: Map[Identifier, NonNullList[?]] =
-    StasisStorageItemForwarder.registry.entrySet.stream().map: entry =>
+    BulbusBuiltInRegistries.itemForwarder.entrySet.stream().map: entry =>
       (entry.getKey.identifier(), NonNullList.withSize(capacity, entry.getValue.empty))
     .toScala(Map)
 
   protected val forwardedStorage: Map[Identifier, ?] =
-    StasisStorageItemForwarder.registry.entrySet.stream().map: entry =>
+    BulbusBuiltInRegistries.itemForwarder.entrySet.stream().map: entry =>
       (entry.getKey.identifier(), entry.getValue.createExposed(forwardedStorages(entry.getKey.identifier()).asInstanceOf))
     .toScala(Map)
 
 
   protected def getForwardedStorages[T](forwarder: StasisStorageItemForwarder[T, ?, ?]): NonNullList[T] =
-    val id = StasisStorageItemForwarder.registry.getKey(forwarder).nn
+    val id = BulbusBuiltInRegistries.itemForwarder.getKey(forwarder).nn
     forwardedStorages(id).asInstanceOf[NonNullList[T]]
 
   def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S, ?]): S =
-    val id = StasisStorageItemForwarder.registry.getKey(forwarder).nn
+    val id = BulbusBuiltInRegistries.itemForwarder.getKey(forwarder).nn
     forwardedStorage(id).asInstanceOf[S]
 
 
@@ -121,9 +121,9 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
   def loadForwarderData(input: ValueInput): Unit =
     input.child("fwd_data").ifPresent: it =>
-      StasisStorageItemForwarder.registry.forEach:
+      BulbusBuiltInRegistries.itemForwarder.forEach:
         case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?, ?] =>
-          val id = StasisStorageItemForwarder.registry.getKey(fwdr).nn
+          val id = BulbusBuiltInRegistries.itemForwarder.getKey(fwdr).nn
           it.childrenListOrEmpty(id.toString).forEach: tag =>
             val j = tag.getByteOr("Slot", -1)
             if j >= 0 && j < capacity then
@@ -134,9 +134,9 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
 
   def saveForwarderData(output: ValueOutput): Unit =
     val tag = output.child("fwd_data")
-    StasisStorageItemForwarder.registry.forEach:
+    BulbusBuiltInRegistries.itemForwarder.forEach:
       case fwdr: TaggedStasisStorageItemForwarder[?, ?, ?, ?] =>
-        val id = StasisStorageItemForwarder.registry.getKey(fwdr).nn
+        val id = BulbusBuiltInRegistries.itemForwarder.getKey(fwdr).nn
         val subtag = tag.childrenList(id.toString)
         val storage = getForwardedStorages(fwdr)
         (0 until capacity).foreach: i =>
@@ -196,7 +196,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
   
   object StorageManager:
     def removeSlot(slot: Int): Unit =
-      StasisStorageItemForwarder.registry.forEach: fwdr =>
+      BulbusBuiltInRegistries.itemForwarder.forEach: fwdr =>
         val storages = getForwardedStorages(fwdr)
         storages.set(slot, fwdr.empty)
       
@@ -204,7 +204,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
       val stack = items.get(slot)
       val ctx = ContainerItemContext.ofSingleSlot(fabricContainerStorage.getSlot(slot))
       removeSlot(slot)
-      StasisStorageItemForwarder.registry.forEach: fwdr =>
+      BulbusBuiltInRegistries.itemForwarder.forEach: fwdr =>
         val storages = getForwardedStorages(fwdr)
         val res = fwdr.tryLoadStorage(stack, ctx)
         res.foreach: it =>
@@ -214,7 +214,7 @@ abstract class StasisStorageBlockEntity(val capacity: Int, baseEntity: BlockEnti
       
 
     def setVoidingSlot(slot: Int): Unit =
-      StasisStorageItemForwarder.registry.forEach: fwdr =>
+      BulbusBuiltInRegistries.itemForwarder.forEach: fwdr =>
         val storages = getForwardedStorages(fwdr)
         fwdr.voiding match
           case Some(voiding) =>
@@ -315,7 +315,7 @@ object StasisStorageBlockEntity:
   
   object ServerTicker extends BlockEntityTicker[StasisStorageBlockEntity]:
     override def tick(level: Level, pos: BlockPos, state: BlockState, entity: StasisStorageBlockEntity): Unit =
-      StasisStorageItemForwarder.registry.forEach: forwarder =>
+      BulbusBuiltInRegistries.itemForwarder.forEach: forwarder =>
         // check to skip trivial case
         if forwarder.transferer ne ForwardingTransferer.passive then
           val self = entity.getForwardedStorage(forwarder)
@@ -358,7 +358,7 @@ object StasisStorageBlockEntity:
 
     def isStasisStorage(stack: ItemStack): Boolean =
       val ctx = ContainerItemContext.withConstant(stack)
-      StasisStorageItemForwarder.registry.stream().anyMatch(_.accepts(stack, ctx))
+      BulbusBuiltInRegistries.itemForwarder.stream().anyMatch(_.accepts(stack, ctx))
 
     def isGarbage(stack: ItemStack): Boolean =
       stack.is(BulbusTags.item.voidsInsertInShelf)

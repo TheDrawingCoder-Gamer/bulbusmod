@@ -74,12 +74,6 @@ trait StasisStorageItemForwarder[Item, World, GenericWorld]:
 
 
 object StasisStorageItemForwarder:
-  val registryKey: ResourceKey[Registry[StasisStorageItemForwarder[?, ?, ?]]] = ResourceKey.createRegistryKey(BulbusMod.locate("stasis_storage_item_forwarder"))
-  val registry: Registry[StasisStorageItemForwarder[?, ?, ?]] = new MappedRegistry[StasisStorageItemForwarder[?, ?, ?]](registryKey, Lifecycle.stable())
-
-  def register[A, B, C](id: Identifier, thingie: StasisStorageItemForwarder[A, B, C]): thingie.type =
-    Registry.register(registry, id, thingie)
-    thingie
 
   trait SingleTypeWormWrapHelper[T](val input: T) extends StasisWormBlockEntity.StorageHelper[T]:
     this: T =>
@@ -132,33 +126,7 @@ object StasisStorageItemForwarder:
         override val parent: StasisWormBlockEntity = parentIn
         override def lookup: BlockApiLookup[SingleTypeStorage, Direction | Null] = blockLookup
 
-  object EnergyForwarder extends SingleTypeLikeForwarder[EnergyStorage]:
-    override def blockLookup: BlockApiLookup[EnergyStorage, Direction | Null] = EnergyStorage.SIDED.asInstanceOf
 
-    override def itemLookup: ItemApiLookup[EnergyStorage, ContainerItemContext] = EnergyStorage.ITEM
-    
-    override def instance: SingleTypeStorageLike[EnergyStorage] = SingleTypeStorageLike.forEnergyStorage
-
-    override def empty: EnergyStorage = EnergyStorage.EMPTY
-
-    override def createExposed(slots: NonNullList[EnergyStorage]): EnergyStorage =
-      BulbusCombinedEnergyStorage(slots)
-    
-    override def wrapWorm(input: EnergyStorage, parentIn: StasisWormBlockEntity): EnergyStorage =
-      new EnergyStorage with StasisWormBlockEntity.StorageHelper[EnergyStorage] with SingleTypeWormWrapHelper[EnergyStorage](input):
-        override def instance: SingleTypeStorageLike[EnergyStorage] = SingleTypeStorageLike.forEnergyStorage
-        
-        override val parent: StasisWormBlockEntity = parentIn
-
-        override def lookup: BlockApiLookup[EnergyStorage, Direction | Null] = blockLookup
-
-    // tech reborn energy is push based
-    override val transferer: ForwardingTransferer[EnergyStorage, EnergyStorage] =
-      (self, that) =>
-        if self.supportsExtraction() && that.supportsInsertion() then
-          Using.resource(Transaction.openOuter()): trans =>
-            EnergyStorageUtil.move(self, that, Long.MaxValue, trans)
-            trans.commit()
         
 
   trait StasisStorageForwarderMixin[I <: TransferVariant[?]] extends TaggedStasisStorageItemForwarder[StasisStorage[I], SlottedStorage[I], Storage[I], I]:
@@ -196,26 +164,3 @@ object StasisStorageItemForwarder:
 
         override def lookup: BlockApiLookup[Storage[I], Direction | Null] = blockLookup
 
-  object ItemForwarder extends StasisStorageItemForwarder.StasisStorageForwarderMixin[ItemVariant]:
-    override def blockLookup: BlockApiLookup[Storage[ItemVariant], Direction | Null] = ItemStorage.SIDED.asInstanceOf
-
-    override def itemLookup: ItemApiLookup[StasisStorage[ItemVariant], ContainerItemContext] = StasisStorage.item
-
-    override def blank: ItemVariant = ItemVariant.blank()
-
-    override def dataCodec: Codec[ItemVariant] = ItemVariant.CODEC
-
-  object FluidForwarder extends StasisStorageItemForwarder.StasisStorageForwarderMixin[FluidVariant]:
-    override def blockLookup: BlockApiLookup[Storage[FluidVariant], Direction | Null] = FluidStorage.SIDED.asInstanceOf
-
-    override def itemLookup: ItemApiLookup[StasisStorage[FluidVariant], ContainerItemContext] = StasisStorage.fluid
-
-    override def blank: FluidVariant = FluidVariant.blank()
-
-    override def dataCodec: Codec[FluidVariant] = FluidVariant.CODEC
-
-  val forItem: StasisStorageItemForwarder[StasisStorage[ItemVariant], SlottedStorage[ItemVariant], Storage[ItemVariant]] = register(BulbusMod.locate("item"), ItemForwarder)
-  val forFluid: StasisStorageItemForwarder[StasisStorage[FluidVariant], SlottedStorage[FluidVariant], Storage[FluidVariant]] = register(BulbusMod.locate("fluid"), FluidForwarder)
-  val forEnergy: StasisStorageItemForwarder[EnergyStorage, EnergyStorage, EnergyStorage] = register(BulbusMod.locate("energy"), EnergyForwarder)
-
-  def init(): Unit = ()
