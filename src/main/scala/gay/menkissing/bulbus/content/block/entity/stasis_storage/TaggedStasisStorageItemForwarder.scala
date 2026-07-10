@@ -5,19 +5,19 @@ import com.mojang.serialization.Codec
 /**
  * Like [[StasisStorageItemForwarder]] but it can also save and load data from the world.
  *
- * @tparam T the storage that will be saved and exposed to the world
- * @tparam D the data type to load/save
+ * @tparam Item The storage for each item
+ * @tparam Data the data type to load/save
  */
 
-trait TaggedStasisStorageItemForwarder[T, S, GenericWorld, D] extends StasisStorageItemForwarder[T, S, GenericWorld]:
-  def dataCodec: Codec[D]
+trait TaggedStasisStorageItemForwarder[Item, World, GenericWorld, Data] extends StasisStorageItemForwarder[Item, World, GenericWorld]:
+  def dataCodec: Codec[Data]
   
-  def loadData(storage: T, data: D): Unit
+  def loadData(storage: Item, data: Data): Unit
   
-  def constructData(storage: T): Option[D]
+  def constructData(storage: Item): Option[Data]
 
   /**
    * What data will be reset to before reloading.
    * @return
    */
-  def defaultData: D
+  def defaultData: Data
