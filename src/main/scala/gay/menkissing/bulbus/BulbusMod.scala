@@ -1,5 +1,6 @@
 package gay.menkissing.bulbus
 
+import gay.menkissing.bulbus.content.block.entity.stasis_storage.StasisStorageItemForwarder
 import gay.menkissing.bulbus.infra.lookup.StasisStorage
 import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, BulbusDataComponentTypes, BulbusItems, BulbusScreens, BulbusSounds}
 import net.fabricmc.api.ModInitializer
@@ -12,6 +13,7 @@ class BulbusMod extends ModInitializer:
     BulbusBlockEntities.init()
     BulbusItems.init()
     StasisStorage.init()
+    StasisStorageItemForwarder.init()
     BulbusScreens.init()
     BulbusSounds.init()
 

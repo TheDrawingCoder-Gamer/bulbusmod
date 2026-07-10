@@ -27,18 +27,18 @@ object BulbusBlockEntities:
   
   def init(): Unit =
     ItemStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm): (ent, _) =>
-      ent.getForwardedStorage(StasisStorageBlockEntity.ItemForwarder)
+      ent.getForwardedStorage(StasisStorageItemForwarder.forItem)
     FluidStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm, stasisAccessor): (ent, _) =>
-      ent.getForwardedStorage(StasisStorageBlockEntity.FluidForwarder)
+      ent.getForwardedStorage(StasisStorageItemForwarder.forFluid)
 
     EnergyStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm, stasisAccessor): (ent, _) =>
-      ent.getForwardedStorage(StasisStorageItemForwarder.EnergyForwarder)
+      ent.getForwardedStorage(StasisStorageItemForwarder.forEnergy)
 
     // i dont really see a need to limit insertion/extraction
     // Go nuts, kids
     ItemStorage.SIDED.registerScalaEntities(stasisAccessor): (ent, dir) =>
       dir match
-        case Direction.UP | Direction.DOWN => ent.getForwardedStorage(StasisStorageBlockEntity.ItemForwarder)
+        case Direction.UP | Direction.DOWN => ent.getForwardedStorage(StasisStorageItemForwarder.forItem)
         case _ => ent.containerStorage
 
 

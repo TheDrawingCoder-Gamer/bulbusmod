@@ -1,5 +1,6 @@
 package gay.menkissing.bulbus.content.block.entity.stasis_storage
 
+import com.mojang.serialization.{Codec, Lifecycle}
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.api.SingleTypeStorage
 import gay.menkissing.bulbus.content.block.entity.{StasisStorageBlockEntity, StasisWormBlockEntity}
@@ -8,11 +9,13 @@ import gay.menkissing.bulbus.infra.lookup.base.{BulbusCombinedEnergyStorage, Com
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
+import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidStorage, FluidVariant}
+import net.fabricmc.fabric.api.transfer.v1.item.{ItemStorage, ItemVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedSlottedStorage, SingleSlotStorage}
 import net.fabricmc.fabric.api.transfer.v1.storage.{SlottedStorage, Storage, StoragePreconditions, StorageView, TransferVariant}
 import net.fabricmc.fabric.api.transfer.v1.transaction.{Transaction, TransactionContext}
-import net.minecraft.core.{Direction, NonNullList}
-import net.minecraft.resources.Identifier
+import net.minecraft.core.{Direction, Holder, MappedRegistry, NonNullList, Registry}
+import net.minecraft.resources.{Identifier, ResourceKey}
 import net.minecraft.world.item.ItemStack
 import team.reborn.energy.api.{EnergyStorage, EnergyStorageUtil}
 
@@ -39,11 +42,6 @@ trait StasisStorageItemForwarder[Item, World, GenericWorld]:
    * @return Either Some storage type, or None
    */
   def tryLoadStorage(stack: ItemStack, ctx: ContainerItemContext): Option[Item]
-
-  /**
-   * @return The name of this forwarder
-   */
-  def name: Identifier
 
   /**
    * @return A default storage implementation that will effectively be a no op when exposed
@@ -76,6 +74,13 @@ trait StasisStorageItemForwarder[Item, World, GenericWorld]:
 
 
 object StasisStorageItemForwarder:
+  val registryKey: ResourceKey[Registry[StasisStorageItemForwarder[?, ?, ?]]] = ResourceKey.createRegistryKey(BulbusMod.locate("stasis_storage_item_forwarder"))
+  val registry: Registry[StasisStorageItemForwarder[?, ?, ?]] = new MappedRegistry[StasisStorageItemForwarder[?, ?, ?]](registryKey, Lifecycle.stable())
+
+  def register[A, B, C](id: Identifier, thingie: StasisStorageItemForwarder[A, B, C]): thingie.type =
+    Registry.register(registry, id, thingie)
+    thingie
+
   trait SingleTypeWormWrapHelper[T](val input: T) extends StasisWormBlockEntity.StorageHelper[T]:
     this: T =>
     protected def instance: SingleTypeStorageLike[T]
@@ -138,8 +143,6 @@ object StasisStorageItemForwarder:
 
     override def createExposed(slots: NonNullList[EnergyStorage]): EnergyStorage =
       BulbusCombinedEnergyStorage(slots)
-
-    override def name: Identifier = BulbusMod.locate("energy")
     
     override def wrapWorm(input: EnergyStorage, parentIn: StasisWormBlockEntity): EnergyStorage =
       new EnergyStorage with StasisWormBlockEntity.StorageHelper[EnergyStorage] with SingleTypeWormWrapHelper[EnergyStorage](input):
@@ -192,3 +195,27 @@ object StasisStorageItemForwarder:
         override val storages: SlottedStorage[I] = input
 
         override def lookup: BlockApiLookup[Storage[I], Direction | Null] = blockLookup
+
+  object ItemForwarder extends StasisStorageItemForwarder.StasisStorageForwarderMixin[ItemVariant]:
+    override def blockLookup: BlockApiLookup[Storage[ItemVariant], Direction | Null] = ItemStorage.SIDED.asInstanceOf
+
+    override def itemLookup: ItemApiLookup[StasisStorage[ItemVariant], ContainerItemContext] = StasisStorage.item
+
+    override def blank: ItemVariant = ItemVariant.blank()
+
+    override def dataCodec: Codec[ItemVariant] = ItemVariant.CODEC
+
+  object FluidForwarder extends StasisStorageItemForwarder.StasisStorageForwarderMixin[FluidVariant]:
+    override def blockLookup: BlockApiLookup[Storage[FluidVariant], Direction | Null] = FluidStorage.SIDED.asInstanceOf
+
+    override def itemLookup: ItemApiLookup[StasisStorage[FluidVariant], ContainerItemContext] = StasisStorage.fluid
+
+    override def blank: FluidVariant = FluidVariant.blank()
+
+    override def dataCodec: Codec[FluidVariant] = FluidVariant.CODEC
+
+  val forItem: StasisStorageItemForwarder[StasisStorage[ItemVariant], SlottedStorage[ItemVariant], Storage[ItemVariant]] = register(BulbusMod.locate("item"), ItemForwarder)
+  val forFluid: StasisStorageItemForwarder[StasisStorage[FluidVariant], SlottedStorage[FluidVariant], Storage[FluidVariant]] = register(BulbusMod.locate("fluid"), FluidForwarder)
+  val forEnergy: StasisStorageItemForwarder[EnergyStorage, EnergyStorage, EnergyStorage] = register(BulbusMod.locate("energy"), EnergyForwarder)
+
+  def init(): Unit = ()

@@ -33,14 +33,15 @@ class StasisWormBlockEntity(pos: BlockPos, state: BlockState)
   var isLocked: Boolean = false
 
   val wormForwardedStorage: Map[Identifier, ?] =
-    StasisStorageBlockEntity.forwarders.map: fwdr =>
-      fwdr.name -> fwdr.wrapWorm(forwardedStorage(fwdr.name).asInstanceOf, this)
+    StasisStorageItemForwarder.registry.entrySet().asScala.iterator.map: entry =>
+      entry.getKey.identifier() -> entry.getValue.wrapWorm(forwardedStorage(entry.getKey.identifier()).asInstanceOf, this)
     .toMap
 
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
   
   override def getForwardedStorage[S](forwarder: StasisStorageItemForwarder[?, S, ?]): S =
-    wormForwardedStorage(forwarder.name).asInstanceOf
+    val id = StasisStorageItemForwarder.registry.getKey(forwarder)
+    wormForwardedStorage(id).asInstanceOf[S]
 
   def withLock[T](block: => T): T =
     isLocked = true
