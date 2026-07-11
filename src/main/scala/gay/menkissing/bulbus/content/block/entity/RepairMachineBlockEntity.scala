@@ -30,6 +30,9 @@ import net.minecraft.world.level.block.Block
 import com.mojang.serialization.MapCodec
 import net.minecraft.world.Containers
 import net.minecraft.world.Clearable
+import net.minecraft.core.particles.SimpleParticleType
+import gay.menkissing.bulbus.registries.BulbusParticles
+import net.minecraft.core.particles.ParticleTypes
 
 class RepairMachineBlockEntity
   (pos: BlockPos, state: BlockState)
@@ -150,6 +153,32 @@ object RepairMachineBlockEntity:
   // slightly better than mending (1.5x!)
   val durabilityPerXp: Int = 3
 
+  object ClientTicker extends BlockEntityTicker[RepairMachineBlockEntity]:
+    override def tick
+      (
+        level: Level,
+        pos: BlockPos,
+        state: BlockState,
+        entity: RepairMachineBlockEntity
+      ): Unit =
+      // ok this part IS from enchanter
+      if entity.active then
+        val random = level.getRandom()
+        if random.nextFloat() < 0.05f then
+          val worldPos = entity.getBlockPos().getCenter()
+          val randomX = -0.3f + random.nextFloat() * 0.6f
+          val randomZ = -0.3f + random.nextFloat() * 0.6f
+          val randomY = random.nextFloat() * 0.4f
+          level.addParticle(
+            BulbusParticles.repairParticle,
+            worldPos.x + randomX,
+            worldPos.y + 0.5 + randomY,
+            worldPos.z + randomZ,
+            0d,
+            -0.1d,
+            0d
+          )
+
   object ServerTicker extends BlockEntityTicker[RepairMachineBlockEntity]:
     override def tick
       (
@@ -182,3 +211,4 @@ object RepairMachineBlockEntity:
               transaction.commit()
       if startedActive != entity.active then
         entity.setChanged()
+      

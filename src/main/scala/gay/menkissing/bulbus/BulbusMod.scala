@@ -5,6 +5,7 @@ import gay.menkissing.bulbus.infra.lookup.StasisStorage
 import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, BulbusBuiltInRegistries, BulbusDataComponentTypes, BulbusItemForwarders, BulbusItems, BulbusRegistries, BulbusScreens, BulbusSounds}
 import net.fabricmc.api.ModInitializer
 import net.minecraft.resources.Identifier
+import gay.menkissing.bulbus.registries.BulbusParticles
 
 class BulbusMod extends ModInitializer:
   override def onInitialize(): Unit =
@@ -17,6 +18,7 @@ class BulbusMod extends ModInitializer:
     BulbusItemForwarders.init()
     BulbusScreens.init()
     BulbusSounds.init()
+    BulbusParticles.init()
 
 object BulbusMod:
   final val MOD_ID: String = "bulbus"

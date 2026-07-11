@@ -58,7 +58,11 @@ final class RepairMachineBlock
         RepairMachineBlockEntity.ServerTicker
       )
     else
-      null
+      BaseEntityBlock.createTickerHelper(
+        `type`,
+        BulbusBlockEntities.repairMachine,
+        RepairMachineBlockEntity.ClientTicker
+      )
   override def useWithoutItem
     (
       state: BlockState,
