@@ -6,10 +6,12 @@ import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusBlocks, Bulb
 import net.fabricmc.api.ModInitializer
 import net.minecraft.resources.Identifier
 import gay.menkissing.bulbus.registries.BulbusParticles
+import gay.menkissing.bulbus.registries.BulbusComponentPredicates
 
 class BulbusMod extends ModInitializer:
   override def onInitialize(): Unit =
     BulbusDataComponentTypes.init()
+    BulbusComponentPredicates.init()
     BulbusBlocks.init()
     BulbusBlockEntities.init()
     BulbusItems.init()

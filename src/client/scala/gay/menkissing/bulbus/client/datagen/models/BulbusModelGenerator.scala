@@ -25,6 +25,13 @@ import org.joml.{Matrix4f, Vector4f}
 import java.util as ju
 import java.util.Optional
 import net.minecraft.core.Direction.Axis
+import net.minecraft.client.renderer.item.properties.conditional.ComponentMatches
+import gay.menkissing.bulbus.registries.BulbusComponentPredicates
+import net.minecraft.core.component.predicates.DataComponentPredicate
+import gay.menkissing.bulbus.components.predicate.KnowledgeStoragePredicate
+import gay.menkissing.bulbus.client.content.itemmodels.KnowledgeGemFillRange
+import net.minecraft.advancements.criterion.MinMaxBounds
+import net.minecraft.client.renderer.item.RangeSelectItemModel
 
 class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider(output):
   def barrelLikeModels(block: Block, blockModelGenerators: BlockModelGenerators): (Identifier, Identifier) =
@@ -121,16 +128,39 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
       SwitchCase(ju.List.of(ItemDisplayContext.GUI), ItemModelUtils.composite(baseBottle, itemSubModel))
     )
     itemModelGenerators.itemModelOutput.accept(BulbusItems.stasisBottle, bottleModel)
+
+  def knowledgeGem(itemModelGenerators: ItemModelGenerators): Unit =
+    def groupMapping(group: String): Identifier =
+      itemModelGenerators.createFlatItemModel(BulbusItems.knowledgeStorage, "_" + group, ModelTemplates.FLAT_ITEM)
+
+
+
+
+    val empty = groupMapping("empty")
+    val low = groupMapping("low")
+    val mid = groupMapping("mid")
+    val high = groupMapping("high")
+
+    val daModel = 
+      ItemModelUtils.rangeSelect(
+        KnowledgeGemFillRange,
+        ItemModelUtils.plainModel(empty),
+        RangeSelectItemModel.Entry(0.125f, ItemModelUtils.plainModel(low)),
+        RangeSelectItemModel.Entry(0.4f, ItemModelUtils.plainModel(mid)),
+        RangeSelectItemModel.Entry(0.85f, ItemModelUtils.plainModel(high))
+      )
+    
+    itemModelGenerators.itemModelOutput.accept(BulbusItems.knowledgeStorage, daModel)
   override def generateItemModels(itemModelGenerators: ItemModelGenerators): Unit =
 
     bottle(itemModelGenerators)
     tube(itemModelGenerators)
+    knowledgeGem(itemModelGenerators)
 
 
     itemModelGenerators.generateFlatItem(BulbusItems.stasisBattery, ModelTemplates.FLAT_ITEM)
     itemModelGenerators.generateFlatItem(BulbusItems.toolContainer, ModelTemplates.FLAT_ITEM)
     itemModelGenerators.generateFlatItem(BulbusItems.holdingBag, ModelTemplates.FLAT_ITEM)
-    itemModelGenerators.generateFlatItem(BulbusItems.knowledgeStorage, ModelTemplates.FLAT_ITEM)
 
 
 object BulbusModelGenerator:

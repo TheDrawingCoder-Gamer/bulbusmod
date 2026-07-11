@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "bulbus:item/knowledge_storage_mid"
+  }
+}

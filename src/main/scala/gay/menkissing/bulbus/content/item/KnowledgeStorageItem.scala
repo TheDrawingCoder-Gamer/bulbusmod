@@ -97,7 +97,7 @@ object KnowledgeStorageItem:
     val efficiencyLevel = BulbusEnchantmentUtil.getLevel(lookup, Enchantments.EFFICIENCY, stack)
     getMax(efficiencyLevel)
 
-  def getMaxEvil(stack: ItemStack): Long =
+  def getMaxEvil(stack: DataComponentGetter): Long =
     val efficiencyLevel = BulbusEnchantmentUtil.getLevelEvil(Enchantments.EFFICIENCY, stack)
     getMax(efficiencyLevel)
 

@@ -1,6 +1,33 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "bulbus:item/knowledge_storage"
+    "type": "minecraft:range_dispatch",
+    "entries": [
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bulbus:item/knowledge_storage_low"
+        },
+        "threshold": 0.125
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bulbus:item/knowledge_storage_mid"
+        },
+        "threshold": 0.4
+      },
+      {
+        "model": {
+          "type": "minecraft:model",
+          "model": "bulbus:item/knowledge_storage_high"
+        },
+        "threshold": 0.85
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "bulbus:item/knowledge_storage_empty"
+    },
+    "property": "bulbus:knowledge_storage_fill"
   }
 }
