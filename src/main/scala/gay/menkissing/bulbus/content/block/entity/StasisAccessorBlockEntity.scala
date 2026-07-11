@@ -20,7 +20,6 @@ import scala.util.Using
 
 class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends StasisStorageBlockEntity(1, BulbusBlockEntities.stasisAccessor, pos, state):
   override val containerView: Container = new ContainerForStasisStorage
-  var ageInTicks: Int = 0
 
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
 
@@ -42,7 +41,3 @@ class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends Stasis
       output.buildResult()
 object StasisAccessorBlockEntity:
   val Logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlockEntity])
-  // : )
-  object ClientTicker extends BlockEntityTicker[StasisAccessorBlockEntity]:
-    override def tick(level: Level, pos: BlockPos, state: BlockState, entity: StasisAccessorBlockEntity): Unit =
-      entity.ageInTicks += 1

@@ -33,11 +33,11 @@ final class RepairMachineBlock
   locally:
     this.registerDefaultState:
       this.stateDefinition.any()
-        .setValue(BlockStateProperties.HORIZONTAL_AXIS, Direction.Axis.X)
+        .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
 
   override protected def createBlockStateDefinition
     (builder: StateDefinition.Builder[Block, BlockState]): Unit =
-    builder.add(BlockStateProperties.HORIZONTAL_AXIS)
+    builder.add(BlockStateProperties.HORIZONTAL_FACING)
   override def newBlockEntity
     (worldPosition: BlockPos, blockState: BlockState): BlockEntity =
     new RepairMachineBlockEntity(worldPosition, blockState)
@@ -58,11 +58,7 @@ final class RepairMachineBlock
         RepairMachineBlockEntity.ServerTicker
       )
     else
-      BaseEntityBlock.createTickerHelper(
-        `type`,
-        BulbusBlockEntities.repairMachine,
-        RepairMachineBlockEntity.ClientTicker
-      )
+      null
   override def useWithoutItem
     (
       state: BlockState,
@@ -121,8 +117,8 @@ final class RepairMachineBlock
 
   override def getStateForPlacement(context: BlockPlaceContext): BlockState =
     this.defaultBlockState.setValue(
-      BlockStateProperties.HORIZONTAL_AXIS,
-      context.getHorizontalDirection().getAxis()
+      BlockStateProperties.HORIZONTAL_FACING,
+      context.getHorizontalDirection().getOpposite()
     )
 
 object RepairMachineBlock:

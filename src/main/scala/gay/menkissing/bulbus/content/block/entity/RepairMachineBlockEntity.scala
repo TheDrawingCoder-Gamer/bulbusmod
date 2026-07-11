@@ -39,8 +39,6 @@ class RepairMachineBlockEntity
   // only used in rendering, so not persistent
   var active: Boolean = false
 
-  var ageInTicks: Int = 0
-
   def heldGem: ItemStack = heldGemIntl
   def heldGem_=(value: ItemStack): Unit =
     heldGemIntl = value
@@ -151,15 +149,6 @@ object RepairMachineBlockEntity:
   // ???
   // slightly better than mending (1.5x!)
   val durabilityPerXp: Int = 3
-
-  object ClientTicker extends BlockEntityTicker[RepairMachineBlockEntity]:
-    override def tick
-      (
-        level: Level,
-        pos: BlockPos,
-        state: BlockState,
-        entity: RepairMachineBlockEntity
-      ): Unit = entity.ageInTicks += 1
 
   object ServerTicker extends BlockEntityTicker[RepairMachineBlockEntity]:
     override def tick

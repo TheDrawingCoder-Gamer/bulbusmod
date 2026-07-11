@@ -16,6 +16,10 @@ import net.minecraft.client.renderer.item.ItemStackRenderState
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.client.renderer.entity.state.ItemClusterRenderState
 import net.minecraft.util.Mth
+import com.mojang.math.Axis
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
+import net.minecraft.core.Direction
+import com.mojang.math.Quadrant
 
 class RepairMachineRenderer(ctx: BlockEntityRendererProvider.Context)
     extends BlockEntityRenderer[
@@ -27,8 +31,18 @@ class RepairMachineRenderer(ctx: BlockEntityRendererProvider.Context)
 
   override def extractRenderState(blockEntity: RepairMachineBlockEntity, state: RepairMachineRenderState, partialTicks: Float, cameraPosition: Vec3, breakProgress: CrumblingOverlay): Unit = 
     super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress)
-    state.ageInTicks = blockEntity.ageInTicks.toFloat + partialTicks
+    state.ageInTicks = blockEntity.getLevel.getGameTime.toFloat + partialTicks
     state.active = blockEntity.active
+    state.rotation = 
+      blockEntity.getBlockState.getValue(BlockStateProperties.HORIZONTAL_FACING) match
+        case Direction.DOWN => 0
+        case Direction.UP => 0
+        case Direction.NORTH => 0
+        case Direction.SOUTH => RepairMachineRenderer.southAngle
+        case Direction.WEST => RepairMachineRenderer.westAngle
+        case Direction.EAST => RepairMachineRenderer.eastAngle
+      
+      
     if !blockEntity.heldGem.isEmpty then
       val itemState = new ItemStackRenderState
       itemModelResolver.updateForTopItem(itemState, blockEntity.heldGem, ItemDisplayContext.GROUND, blockEntity.getLevel, null, ItemClusterRenderState.getSeedForItemStack(blockEntity.heldGem))
@@ -62,6 +76,7 @@ class RepairMachineRenderer(ctx: BlockEntityRendererProvider.Context)
     state.primaryItem.foreach: primaryItem =>
       poseStack.pushPose()
       poseStack.translate(0.5f, 1.1f, 0.5f)
+      poseStack.mulPose(Axis.YP.rotation(state.rotation))
 
       primaryItem.submit(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0)
 
@@ -70,3 +85,9 @@ class RepairMachineRenderer(ctx: BlockEntityRendererProvider.Context)
 
   override def createRenderState(): RepairMachineRenderState =
     new RepairMachineRenderState
+
+object RepairMachineRenderer:
+  final val halfPi = math.Pi.toFloat / 2
+  final val eastAngle = halfPi
+  final val southAngle = math.Pi.toFloat
+  final val westAngle = halfPi * 3

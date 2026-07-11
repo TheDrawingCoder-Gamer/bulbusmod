@@ -78,7 +78,7 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
 
   override def getTicker[T <: BlockEntity](level: Level, blockState: BlockState, `type`: BlockEntityType[T]): BlockEntityTicker[T] | Null =
     if level.isClientSide then
-      BaseEntityBlock.createTickerHelper(`type`, BulbusBlockEntities.stasisAccessor, StasisAccessorBlockEntity.ClientTicker)
+      null
     else
       BaseEntityBlock.createTickerHelper(`type`, BulbusBlockEntities.stasisAccessor, StasisStorageBlockEntity.ServerTicker)
 

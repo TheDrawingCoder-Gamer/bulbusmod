@@ -47,12 +47,14 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
     blockModelGenerators.blockStateOutput.accept:
       MultiVariantGenerator.dispatch(BulbusBlocks.repairMachine, BlockModelGenerators.plainVariant(customRepairModel))
         .`with`:
-          PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_AXIS).generate: it =>
+          PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_FACING).generate: it =>
             val yRot =
               it match
-                case Axis.X => Quadrant.R0
-                case Axis.Y => Quadrant.R0
-                case Axis.Z =>  Quadrant.R90
+                case Direction.NORTH => Quadrant.R0
+                case Direction.EAST => Quadrant.R90
+                case Direction.SOUTH => Quadrant.R180
+                case Direction.WEST => Quadrant.R270
+                case _ => Quadrant.R0
             
             VariantMutator.Y_ROT.withValue(yRot)
               

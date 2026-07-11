@@ -24,7 +24,7 @@ final class StasisAccessorBlockEntityRenderer(ctx: BlockEntityRendererProvider.C
   override def extractRenderState(blockEntity: StasisAccessorBlockEntity, state: StasisAccessorBlockEntityRenderState, partialTicks: Float, cameraPosition: Vec3, breakProgress: ModelFeatureRenderer.CrumblingOverlay): Unit =
     super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress)
     val stack = blockEntity.getStoredItem
-    state.ageInTicks = blockEntity.ageInTicks.toFloat + partialTicks
+    state.ageInTicks = blockEntity.getLevel.getGameTime.toFloat + partialTicks
     if !stack.isEmpty then
       val itemStackRenderState = new ItemStackRenderState
       itemModelResolver.updateForTopItem(itemStackRenderState, stack, ItemDisplayContext.GROUND, blockEntity

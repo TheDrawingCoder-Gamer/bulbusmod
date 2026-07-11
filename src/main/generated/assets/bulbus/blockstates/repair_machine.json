@@ -1,11 +1,19 @@
 {
   "variants": {
-    "axis=x": {
-      "model": "bulbus:block/repair_machine"
-    },
-    "axis=z": {
+    "facing=east": {
       "model": "bulbus:block/repair_machine",
       "y": 90
+    },
+    "facing=north": {
+      "model": "bulbus:block/repair_machine"
+    },
+    "facing=south": {
+      "model": "bulbus:block/repair_machine",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "bulbus:block/repair_machine",
+      "y": 270
     }
   }
 }
