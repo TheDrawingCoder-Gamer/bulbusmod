@@ -24,6 +24,7 @@ import org.joml.{Matrix4f, Vector4f}
 
 import java.util as ju
 import java.util.Optional
+import net.minecraft.core.Direction.Axis
 
 class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider(output):
   def barrelLikeModels(block: Block, blockModelGenerators: BlockModelGenerators): (Identifier, Identifier) =
@@ -35,12 +36,26 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
     val openModel = ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(block, "_open", openMapping, blockModelGenerators.modelOutput)
     (closedModel, openModel)
 
+
   override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
     val customAccessorModel = ModelLocationUtils.getModelLocation(BulbusBlocks.stasisAccessor)
     blockModelGenerators.blockStateOutput.accept:
       BlockModelGenerators.createSimpleBlock(BulbusBlocks.stasisAccessor, BlockModelGenerators.plainVariant(customAccessorModel))
     blockModelGenerators.registerSimpleItemModel(BulbusBlocks.stasisAccessor, customAccessorModel)
 
+    val customRepairModel = ModelLocationUtils.getModelLocation(BulbusBlocks.repairMachine)
+    blockModelGenerators.blockStateOutput.accept:
+      MultiVariantGenerator.dispatch(BulbusBlocks.repairMachine, BlockModelGenerators.plainVariant(customRepairModel))
+        .`with`:
+          PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_AXIS).generate: it =>
+            val yRot =
+              it match
+                case Axis.X => Quadrant.R0
+                case Axis.Y => Quadrant.R0
+                case Axis.Z =>  Quadrant.R90
+            
+            VariantMutator.Y_ROT.withValue(yRot)
+              
     val (closedShelf, openShelf) = barrelLikeModels(BulbusBlocks.stasisShelf, blockModelGenerators)
     // somehow made this more complex between versions, thanks mojang
     blockModelGenerators.blockStateOutput.accept:

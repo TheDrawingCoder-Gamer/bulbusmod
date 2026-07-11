@@ -14,3 +14,6 @@ class BulbusBlockTagProvider(output: FabricPackOutput, lookup: CompletableFuture
       .add(BulbusBlocks.stasisShelf)
       .add(BulbusBlocks.stasisWorm)
       .add(BulbusBlocks.stasisAccessor)
+    
+    valueLookupBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
+      .add(BulbusBlocks.repairMachine)

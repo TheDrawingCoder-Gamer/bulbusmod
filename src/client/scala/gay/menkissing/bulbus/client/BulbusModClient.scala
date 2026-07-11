@@ -6,10 +6,11 @@ import gay.menkissing.bulbus.client.gui.BulbusGuis
 import gay.menkissing.bulbus.registries.BulbusBlockEntities
 import net.fabricmc.api.ClientModInitializer
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers
+import gay.menkissing.bulbus.client.content.BulbusBlockEntityRenderers
 
 class BulbusModClient extends ClientModInitializer:
   override def onInitializeClient(): Unit =
-    BlockEntityRenderers.register(BulbusBlockEntities.stasisAccessor, StasisAccessorBlockEntityRenderer.apply)
+    BulbusBlockEntityRenderers.register()
     TooltipProviders.register()
     BulbusTintSources.register()
     BulbusItemModels.register()

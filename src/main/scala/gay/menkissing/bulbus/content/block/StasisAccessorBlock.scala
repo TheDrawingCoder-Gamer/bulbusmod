@@ -1,6 +1,7 @@
 package gay.menkissing.bulbus.content.block
 
 import com.mojang.serialization.MapCodec
+import gay.menkissing.bulbus.util.BulbusUtil
 import gay.menkissing.bulbus.content.block.entity.{StasisAccessorBlockEntity, StasisStorageBlockEntity}
 import gay.menkissing.bulbus.registries.{BulbusBlockEntities, BulbusSounds}
 import net.minecraft.core.BlockPos
@@ -28,9 +29,6 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
     quickPlaySound(level, pos, BulbusSounds.stasisAccessorRemoveItem)
 
 
-  def giveOrDrop(level: Level, pos: BlockPos, player: Player, stack: ItemStack): Unit =
-    if !player.addItem(stack) then
-      Containers.dropItemStack(level, pos.getX, pos.getY + 1.2f, pos.getZ, stack)
 
   override def newBlockEntity(worldPosition: BlockPos, blockState: BlockState): BlockEntity =
     new StasisAccessorBlockEntity(worldPosition, blockState)
@@ -45,7 +43,7 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
           if !bse.containerView.getItem(0).isEmpty then
             val result = bse.containerView.removeItem(0, 1)
             playExtractionSound(level, pos)
-            giveOrDrop(level, pos, player, result)
+            BulbusUtil.giveOrDrop(level, pos, player, result)
 
             InteractionResult.SUCCESS
           else
@@ -72,7 +70,7 @@ class StasisAccessorBlock(props: BlockBehaviour.Properties) extends BaseEntityBl
             bse.setChanged()
             itemStack.shrink(1)
             if !swappedWith.isEmpty then
-              giveOrDrop(level, pos, player, swappedWith)
+              BulbusUtil.giveOrDrop(level, pos, player, swappedWith)
           else
             quickPlaySound(level, pos, BulbusSounds.stasisAccessorAddItemFail)
           InteractionResult.SUCCESS

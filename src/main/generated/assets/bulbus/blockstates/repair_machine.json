@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "bulbus:block/repair_machine"
+    },
+    "axis=z": {
+      "model": "bulbus:block/repair_machine",
+      "y": 90
+    }
+  }
+}

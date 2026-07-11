@@ -7,3 +7,5 @@ object BulbusBlockIds:
   val stasisShelf: Identifier = BulbusMod.locate("stasis_shelf")
   val stasisWorm: Identifier = BulbusMod.locate("stasis_worm")
   val stasisAccessor: Identifier = BulbusMod.locate("stasis_accessor")
+
+  val repairMachine: Identifier = BulbusMod.locate("repair_machine")

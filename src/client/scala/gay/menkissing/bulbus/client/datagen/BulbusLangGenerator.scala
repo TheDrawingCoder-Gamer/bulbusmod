@@ -33,6 +33,8 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
     
     translationBuilder.add(BulbusItems.stasisAccessor, "Stasis Accessor")
 
+    translationBuilder.add(BulbusItems.repairMachine, "Repair-o-matic")
+
     translationBuilder.add(BulbusItems.knowledgeStorage, "Knowledge Storage")
     translationBuilder.add(BulbusTranslationKeys.knowledgeStorage.tooltip.count, "%1$s / %2$d")
 

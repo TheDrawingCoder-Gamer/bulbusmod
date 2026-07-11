@@ -3,7 +3,7 @@ package gay.menkissing.bulbus.registries
 import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.content.block.entity.StasisStorageBlockEntity.StasisShelfBlockEntity
 import gay.menkissing.bulbus.content.block.entity.stasis_storage.StasisStorageItemForwarder
-import gay.menkissing.bulbus.content.block.entity.{StasisAccessorBlockEntity, StasisStorageBlockEntity, StasisWormBlockEntity}
+import gay.menkissing.bulbus.content.block.entity.{RepairMachineBlockEntity, StasisAccessorBlockEntity, StasisStorageBlockEntity, StasisWormBlockEntity}
 import gay.menkissing.bulbus.util.LookupUtil.*
 import net.fabricmc.fabric.api.`object`.builder.v1.block.entity.FabricBlockEntityTypeBuilder
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
@@ -24,7 +24,9 @@ object BulbusBlockEntities:
   val stasisShelf: BlockEntityType[StasisShelfBlockEntity] = makeEntity("stasis_shelf", StasisShelfBlockEntity.apply, BulbusBlocks.stasisShelf)
   val stasisWorm: BlockEntityType[StasisWormBlockEntity] = makeEntity("stasis_worm", StasisWormBlockEntity.apply, BulbusBlocks.stasisWorm)
   val stasisAccessor: BlockEntityType[StasisAccessorBlockEntity] = makeEntity("stasis_accessor", StasisAccessorBlockEntity.apply, BulbusBlocks.stasisAccessor)
-  
+
+  val repairMachine: BlockEntityType[RepairMachineBlockEntity] = makeEntity("repair_machine", RepairMachineBlockEntity.apply, BulbusBlocks.repairMachine)
+
   def init(): Unit =
     ItemStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm): (ent, _) =>
       ent.getForwardedStorage(BulbusItemForwarders.forItem)
