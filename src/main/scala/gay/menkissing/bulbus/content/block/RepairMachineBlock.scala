@@ -29,7 +29,7 @@ import net.minecraft.world.item.context.BlockPlaceContext
 
 final class RepairMachineBlock
   (props: BlockBehaviour.Properties)
-    extends BaseEntityBlock(props):
+    extends BaseEntityBlock(props), HorizontalPlacementBlock:
   locally:
     this.registerDefaultState:
       this.stateDefinition.any()
@@ -118,12 +118,6 @@ final class RepairMachineBlock
           else InteractionResult.PASS
 
         case None => InteractionResult.PASS
-
-  override def getStateForPlacement(context: BlockPlaceContext): BlockState =
-    this.defaultBlockState.setValue(
-      BlockStateProperties.HORIZONTAL_FACING,
-      context.getHorizontalDirection().getOpposite()
-    )
 
 object RepairMachineBlock:
   val codec: MapCodec[RepairMachineBlock] =

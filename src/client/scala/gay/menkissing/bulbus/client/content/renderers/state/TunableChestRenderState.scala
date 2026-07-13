@@ -5,3 +5,4 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState
 
 final class TunableChestRenderState extends BlockEntityRenderState:
   var channel: TuningChannel = TuningChannel.DEFAULT
+  var rotation: Float = 0.0f

@@ -84,7 +84,12 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
 
 
     blockModelGenerators.blockStateOutput.accept:
-      MultiVariantGenerator.dispatch(BulbusBlocks.tunableChest, BlockModelGenerators.plainVariant(tunableChest))
+      MultiVariantGenerator.dispatch(BulbusBlocks.tunableChest, BlockModelGenerators.plainVariant(tunableChest)).`with`:
+        PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_FACING)
+          .select(Direction.NORTH, VariantMutator.Y_ROT.withValue(Quadrant.R0))
+          .select(Direction.EAST, VariantMutator.Y_ROT.withValue(Quadrant.R90))
+          .select(Direction.SOUTH, VariantMutator.Y_ROT.withValue(Quadrant.R180))
+          .select(Direction.WEST, VariantMutator.Y_ROT.withValue(Quadrant.R270))
 
 
     val (closedWorm, openWorm) = barrelLikeModels(BulbusBlocks.stasisWorm, blockModelGenerators)
