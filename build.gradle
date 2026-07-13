@@ -16,6 +16,7 @@ sourceSets {
     main {
         java {
             srcDirs = []
+            destinationDirectory.set(file("build/evil_do_not_use"))
         }
 
         scala {

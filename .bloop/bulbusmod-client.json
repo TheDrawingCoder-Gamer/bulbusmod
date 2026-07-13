@@ -452,22 +452,6 @@
                 },
                 {
                     "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-loot-api-v3",
-                    "version": "3.0.12+00a1fba64c",
-                    "artifacts": [
-                        {
-                            "name": "fabric-loot-api-v3",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-loot-api-v3/3.0.12+00a1fba64c/58ffa00757774d7060115afa05742753ff26c769/fabric-loot-api-v3-3.0.12+00a1fba64c.jar"
-                        },
-                        {
-                            "name": "fabric-loot-api-v3",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-loot-api-v3/3.0.12+00a1fba64c/b281629abdd2cd9a108b82ecff18952e1f0d530b/fabric-loot-api-v3-3.0.12+00a1fba64c-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "net.fabricmc.fabric-api",
                     "name": "fabric-rendering-v1",
                     "version": "23.3.0+e9207d814c",
                     "artifacts": [
@@ -479,6 +463,22 @@
                         {
                             "name": "fabric-rendering-v1",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-rendering-v1/23.3.0+e9207d814c/f0aa40fe7c097e4a33579dd23a25516b97a5ad42/fabric-rendering-v1-23.3.0+e9207d814c.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-loot-api-v3",
+                    "version": "3.0.12+00a1fba64c",
+                    "artifacts": [
+                        {
+                            "name": "fabric-loot-api-v3",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-loot-api-v3/3.0.12+00a1fba64c/58ffa00757774d7060115afa05742753ff26c769/fabric-loot-api-v3-3.0.12+00a1fba64c.jar"
+                        },
+                        {
+                            "name": "fabric-loot-api-v3",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-loot-api-v3/3.0.12+00a1fba64c/b281629abdd2cd9a108b82ecff18952e1f0d530b/fabric-loot-api-v3-3.0.12+00a1fba64c-sources.jar"
                         }
                     ]
                 },
@@ -516,22 +516,6 @@
                 },
                 {
                     "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-block-api-v1",
-                    "version": "3.0.2+ec56b6014c",
-                    "artifacts": [
-                        {
-                            "name": "fabric-block-api-v1",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-block-api-v1/3.0.2+ec56b6014c/f5f91f5b317b7acd3014677dd909b55ebc4097b2/fabric-block-api-v1-3.0.2+ec56b6014c.jar"
-                        },
-                        {
-                            "name": "fabric-block-api-v1",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-block-api-v1/3.0.2+ec56b6014c/b28368af5fff270d7a3ef7d66bfc55f977c59f3b/fabric-block-api-v1-3.0.2+ec56b6014c-sources.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "net.fabricmc.fabric-api",
                     "name": "fabric-api-base",
                     "version": "2.0.3+ece063234c",
                     "artifacts": [
@@ -543,6 +527,22 @@
                         {
                             "name": "fabric-api-base",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-api-base/2.0.3+ece063234c/bdf802883d0f9c1034c436367ab2c7e04ce34ca6/fabric-api-base-2.0.3+ece063234c.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-block-api-v1",
+                    "version": "3.0.2+ec56b6014c",
+                    "artifacts": [
+                        {
+                            "name": "fabric-block-api-v1",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-block-api-v1/3.0.2+ec56b6014c/f5f91f5b317b7acd3014677dd909b55ebc4097b2/fabric-block-api-v1-3.0.2+ec56b6014c.jar"
+                        },
+                        {
+                            "name": "fabric-block-api-v1",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-block-api-v1/3.0.2+ec56b6014c/b28368af5fff270d7a3ef7d66bfc55f977c59f3b/fabric-block-api-v1-3.0.2+ec56b6014c-sources.jar"
                         }
                     ]
                 },
@@ -1210,22 +1210,6 @@
                     ]
                 },
                 {
-                    "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-dimensions-v1",
-                    "version": "5.1.6+9cbf5da54c",
-                    "artifacts": [
-                        {
-                            "name": "fabric-dimensions-v1",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-dimensions-v1/5.1.6+9cbf5da54c/501ad573c3e45e74327386c4aa4a636040210b72/fabric-dimensions-v1-5.1.6+9cbf5da54c.jar"
-                        },
-                        {
-                            "name": "fabric-dimensions-v1",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-dimensions-v1/5.1.6+9cbf5da54c/b1314778cbfddfe83b551595849aa8660ca6fcc/fabric-dimensions-v1-5.1.6+9cbf5da54c-sources.jar"
-                        }
-                    ]
-                },
-                {
                     "organization": "org.ow2.asm",
                     "name": "asm-util",
                     "version": "9.10.1",
@@ -1238,6 +1222,22 @@
                         {
                             "name": "asm-util",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-util/9.10.1/7bb9d450e8d4cbf9f9e04096c44bbfe7fba80b15/asm-util-9.10.1.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-dimensions-v1",
+                    "version": "5.1.6+9cbf5da54c",
+                    "artifacts": [
+                        {
+                            "name": "fabric-dimensions-v1",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-dimensions-v1/5.1.6+9cbf5da54c/501ad573c3e45e74327386c4aa4a636040210b72/fabric-dimensions-v1-5.1.6+9cbf5da54c.jar"
+                        },
+                        {
+                            "name": "fabric-dimensions-v1",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-dimensions-v1/5.1.6+9cbf5da54c/b1314778cbfddfe83b551595849aa8660ca6fcc/fabric-dimensions-v1-5.1.6+9cbf5da54c-sources.jar"
                         }
                     ]
                 },
@@ -1307,22 +1307,6 @@
                 },
                 {
                     "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-screen-api-v1",
-                    "version": "5.1.0+981dd9b24c",
-                    "artifacts": [
-                        {
-                            "name": "fabric-screen-api-v1",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-screen-api-v1/5.1.0+981dd9b24c/124c5e2da928be52095b1f3a6259be1b208cac05/fabric-screen-api-v1-5.1.0+981dd9b24c-sources.jar"
-                        },
-                        {
-                            "name": "fabric-screen-api-v1",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-screen-api-v1/5.1.0+981dd9b24c/bef364518a83e916a8c24b8d39b9eb10e245e0e2/fabric-screen-api-v1-5.1.0+981dd9b24c.jar"
-                        }
-                    ]
-                },
-                {
-                    "organization": "net.fabricmc.fabric-api",
                     "name": "fabric-creative-tab-api-v1",
                     "version": "5.0.11+d871b99e4c",
                     "artifacts": [
@@ -1334,6 +1318,22 @@
                         {
                             "name": "fabric-creative-tab-api-v1",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-creative-tab-api-v1/5.0.11+d871b99e4c/9e6937cef2aa7955d2ff66c9d2415118c58ec15c/fabric-creative-tab-api-v1-5.0.11+d871b99e4c.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-screen-api-v1",
+                    "version": "5.1.0+981dd9b24c",
+                    "artifacts": [
+                        {
+                            "name": "fabric-screen-api-v1",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-screen-api-v1/5.1.0+981dd9b24c/124c5e2da928be52095b1f3a6259be1b208cac05/fabric-screen-api-v1-5.1.0+981dd9b24c-sources.jar"
+                        },
+                        {
+                            "name": "fabric-screen-api-v1",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-screen-api-v1/5.1.0+981dd9b24c/bef364518a83e916a8c24b8d39b9eb10e245e0e2/fabric-screen-api-v1-5.1.0+981dd9b24c.jar"
                         }
                     ]
                 },
@@ -1520,22 +1520,6 @@
                     ]
                 },
                 {
-                    "organization": "io.netty",
-                    "name": "netty-transport-native-unix-common",
-                    "version": "4.2.7.Final",
-                    "artifacts": [
-                        {
-                            "name": "netty-transport-native-unix-common",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport-native-unix-common/4.2.7.Final/89953f04259ea7502cffb313630dd51e00e60669/netty-transport-native-unix-common-4.2.7.Final.jar"
-                        },
-                        {
-                            "name": "netty-transport-native-unix-common",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport-native-unix-common/4.2.7.Final/a82c40b0ef3bfb4e75c926695d4ea61a51461554/netty-transport-native-unix-common-4.2.7.Final-sources.jar"
-                        }
-                    ]
-                },
-                {
                     "organization": "net.java.dev.jna",
                     "name": "jna",
                     "version": "5.17.0",
@@ -1564,6 +1548,22 @@
                         {
                             "name": "netty-codec-base",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-codec-base/4.2.7.Final/915e381ebabcf115f1c7ff7032d55c48afb50210/netty-codec-base-4.2.7.Final.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "io.netty",
+                    "name": "netty-transport-native-unix-common",
+                    "version": "4.2.7.Final",
+                    "artifacts": [
+                        {
+                            "name": "netty-transport-native-unix-common",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport-native-unix-common/4.2.7.Final/89953f04259ea7502cffb313630dd51e00e60669/netty-transport-native-unix-common-4.2.7.Final.jar"
+                        },
+                        {
+                            "name": "netty-transport-native-unix-common",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-transport-native-unix-common/4.2.7.Final/a82c40b0ef3bfb4e75c926695d4ea61a51461554/netty-transport-native-unix-common-4.2.7.Final-sources.jar"
                         }
                     ]
                 },
@@ -1771,22 +1771,6 @@
                     ]
                 },
                 {
-                    "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-gametest-api-v1",
-                    "version": "4.0.17+867b87624c",
-                    "artifacts": [
-                        {
-                            "name": "fabric-gametest-api-v1",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-gametest-api-v1/4.0.17+867b87624c/7f1d67097c84936e612a9658ffe723efac13d66e/fabric-gametest-api-v1-4.0.17+867b87624c-sources.jar"
-                        },
-                        {
-                            "name": "fabric-gametest-api-v1",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-gametest-api-v1/4.0.17+867b87624c/a210e8152e62d54483fb021d7d144f94bdfd9065/fabric-gametest-api-v1-4.0.17+867b87624c.jar"
-                        }
-                    ]
-                },
-                {
                     "organization": "com.mojang",
                     "name": "text2speech",
                     "version": "1.18.11",
@@ -1799,6 +1783,22 @@
                             "name": "text2speech",
                             "classifier": "sources",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/com.mojang/text2speech/1.18.11/7d5fb57405ae67117b5471c243067c0efe0f6b58/text2speech-1.18.11-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-gametest-api-v1",
+                    "version": "4.0.17+867b87624c",
+                    "artifacts": [
+                        {
+                            "name": "fabric-gametest-api-v1",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-gametest-api-v1/4.0.17+867b87624c/7f1d67097c84936e612a9658ffe723efac13d66e/fabric-gametest-api-v1-4.0.17+867b87624c-sources.jar"
+                        },
+                        {
+                            "name": "fabric-gametest-api-v1",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-gametest-api-v1/4.0.17+867b87624c/a210e8152e62d54483fb021d7d144f94bdfd9065/fabric-gametest-api-v1-4.0.17+867b87624c.jar"
                         }
                     ]
                 },
@@ -1835,22 +1835,6 @@
                     ]
                 },
                 {
-                    "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-resource-loader-v0",
-                    "version": "3.3.17+4fc5413f4c",
-                    "artifacts": [
-                        {
-                            "name": "fabric-resource-loader-v0",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-resource-loader-v0/3.3.17+4fc5413f4c/c2e496d77853c7fd1f2b3bd00b44e355dc6ba576/fabric-resource-loader-v0-3.3.17+4fc5413f4c.jar"
-                        },
-                        {
-                            "name": "fabric-resource-loader-v0",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-resource-loader-v0/3.3.17+4fc5413f4c/290a8dcbf3e2936e3ddfd3f4c0720cb433ad836/fabric-resource-loader-v0-3.3.17+4fc5413f4c-sources.jar"
-                        }
-                    ]
-                },
-                {
                     "organization": "at.yawk.lz4",
                     "name": "lz4-java",
                     "version": "1.10.1",
@@ -1863,6 +1847,22 @@
                         {
                             "name": "lz4-java",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/at.yawk.lz4/lz4-java/1.10.1/f541d7f910fe3d76f38f799c507c48cc81b12ecb/lz4-java-1.10.1.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-resource-loader-v0",
+                    "version": "3.3.17+4fc5413f4c",
+                    "artifacts": [
+                        {
+                            "name": "fabric-resource-loader-v0",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-resource-loader-v0/3.3.17+4fc5413f4c/c2e496d77853c7fd1f2b3bd00b44e355dc6ba576/fabric-resource-loader-v0-3.3.17+4fc5413f4c.jar"
+                        },
+                        {
+                            "name": "fabric-resource-loader-v0",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-resource-loader-v0/3.3.17+4fc5413f4c/290a8dcbf3e2936e3ddfd3f4c0720cb433ad836/fabric-resource-loader-v0-3.3.17+4fc5413f4c-sources.jar"
                         }
                     ]
                 },
@@ -1894,18 +1894,18 @@
                     ]
                 },
                 {
-                    "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-command-api-v2",
-                    "version": "3.0.5+e2bdee784c",
+                    "organization": "org.lwjgl",
+                    "name": "lwjgl-tinyfd",
+                    "version": "3.4.1",
                     "artifacts": [
                         {
-                            "name": "fabric-command-api-v2",
+                            "name": "lwjgl-tinyfd",
                             "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-command-api-v2/3.0.5+e2bdee784c/54bd6b24c59ea4dff7c459a31a012a4037b5dbb1/fabric-command-api-v2-3.0.5+e2bdee784c-sources.jar"
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-tinyfd/3.4.1/419e8f5d842330b762c6900ba42a5fa0ef52589e/lwjgl-tinyfd-3.4.1-sources.jar"
                         },
                         {
-                            "name": "fabric-command-api-v2",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-command-api-v2/3.0.5+e2bdee784c/d2bfa62e2f489900be2210dfb84458dcdecb75b6/fabric-command-api-v2-3.0.5+e2bdee784c.jar"
+                            "name": "lwjgl-tinyfd",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-tinyfd/3.4.1/562697d40dbd2ed0424bf24dcf65d51170f81adf/lwjgl-tinyfd-3.4.1.jar"
                         }
                     ]
                 },
@@ -1926,18 +1926,18 @@
                     ]
                 },
                 {
-                    "organization": "org.lwjgl",
-                    "name": "lwjgl-tinyfd",
-                    "version": "3.4.1",
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-command-api-v2",
+                    "version": "3.0.5+e2bdee784c",
                     "artifacts": [
                         {
-                            "name": "lwjgl-tinyfd",
+                            "name": "fabric-command-api-v2",
                             "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-tinyfd/3.4.1/419e8f5d842330b762c6900ba42a5fa0ef52589e/lwjgl-tinyfd-3.4.1-sources.jar"
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-command-api-v2/3.0.5+e2bdee784c/54bd6b24c59ea4dff7c459a31a012a4037b5dbb1/fabric-command-api-v2-3.0.5+e2bdee784c-sources.jar"
                         },
                         {
-                            "name": "lwjgl-tinyfd",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-tinyfd/3.4.1/562697d40dbd2ed0424bf24dcf65d51170f81adf/lwjgl-tinyfd-3.4.1.jar"
+                            "name": "fabric-command-api-v2",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-command-api-v2/3.0.5+e2bdee784c/d2bfa62e2f489900be2210dfb84458dcdecb75b6/fabric-command-api-v2-3.0.5+e2bdee784c.jar"
                         }
                     ]
                 },
@@ -2262,22 +2262,6 @@
                     ]
                 },
                 {
-                    "organization": "io.netty",
-                    "name": "netty-handler",
-                    "version": "4.2.7.Final",
-                    "artifacts": [
-                        {
-                            "name": "netty-handler",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.2.7.Final/7ad8a1f851e2e6fe93cdd091871fda2b81c03b5b/netty-handler-4.2.7.Final.jar"
-                        },
-                        {
-                            "name": "netty-handler",
-                            "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.2.7.Final/d62036c292296beb6e0cd535f888062a1c649676/netty-handler-4.2.7.Final-sources.jar"
-                        }
-                    ]
-                },
-                {
                     "organization": "net.java.dev.jna",
                     "name": "jna-platform",
                     "version": "5.17.0",
@@ -2290,6 +2274,22 @@
                             "name": "jna-platform",
                             "classifier": "sources",
                             "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.java.dev.jna/jna-platform/5.17.0/d771ab7bcab3669533833f523539989cbbda85d2/jna-platform-5.17.0-sources.jar"
+                        }
+                    ]
+                },
+                {
+                    "organization": "net.fabricmc.fabric-api",
+                    "name": "fabric-transfer-api-v1",
+                    "version": "8.0.6+357ea7334c",
+                    "artifacts": [
+                        {
+                            "name": "fabric-transfer-api-v1",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-transfer-api-v1/8.0.6+357ea7334c/13e5a331abc499be570ea0f0e0c7d6277716ba8d/fabric-transfer-api-v1-8.0.6+357ea7334c.jar"
+                        },
+                        {
+                            "name": "fabric-transfer-api-v1",
+                            "classifier": "sources",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-transfer-api-v1/8.0.6+357ea7334c/fdd8632d59524fcc88b02d58947ea8027bc67375/fabric-transfer-api-v1-8.0.6+357ea7334c-sources.jar"
                         }
                     ]
                 },
@@ -2310,18 +2310,18 @@
                     ]
                 },
                 {
-                    "organization": "net.fabricmc.fabric-api",
-                    "name": "fabric-transfer-api-v1",
-                    "version": "8.0.6+357ea7334c",
+                    "organization": "io.netty",
+                    "name": "netty-handler",
+                    "version": "4.2.7.Final",
                     "artifacts": [
                         {
-                            "name": "fabric-transfer-api-v1",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-transfer-api-v1/8.0.6+357ea7334c/13e5a331abc499be570ea0f0e0c7d6277716ba8d/fabric-transfer-api-v1-8.0.6+357ea7334c.jar"
+                            "name": "netty-handler",
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.2.7.Final/7ad8a1f851e2e6fe93cdd091871fda2b81c03b5b/netty-handler-4.2.7.Final.jar"
                         },
                         {
-                            "name": "fabric-transfer-api-v1",
+                            "name": "netty-handler",
                             "classifier": "sources",
-                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/net.fabricmc.fabric-api/fabric-transfer-api-v1/8.0.6+357ea7334c/fdd8632d59524fcc88b02d58947ea8027bc67375/fabric-transfer-api-v1-8.0.6+357ea7334c-sources.jar"
+                            "path": "/home/bulby/.gradle/caches/modules-2/files-2.1/io.netty/netty-handler/4.2.7.Final/d62036c292296beb6e0cd535f888062a1c649676/netty-handler-4.2.7.Final-sources.jar"
                         }
                     ]
                 },

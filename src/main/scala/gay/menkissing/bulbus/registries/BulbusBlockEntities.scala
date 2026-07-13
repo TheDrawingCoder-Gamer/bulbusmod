@@ -15,6 +15,8 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import team.reborn.energy.api.EnergyStorage
+import gay.menkissing.bulbus.content.block.entity.TunableChestBlockEntity
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage
 
 object BulbusBlockEntities:
   def makeEntity[T <: BlockEntity](name: String, factory: FabricBlockEntityTypeBuilder.Factory[T], blocks: Block*): BlockEntityType[T] =
@@ -26,6 +28,8 @@ object BulbusBlockEntities:
   val stasisAccessor: BlockEntityType[StasisAccessorBlockEntity] = makeEntity("stasis_accessor", StasisAccessorBlockEntity.apply, BulbusBlocks.stasisAccessor)
 
   val repairMachine: BlockEntityType[RepairMachineBlockEntity] = makeEntity("repair_machine", RepairMachineBlockEntity.apply, BulbusBlocks.repairMachine)
+
+  val tunableChest: BlockEntityType[TunableChestBlockEntity] = makeEntity("tunable_chest", TunableChestBlockEntity.apply, BulbusBlocks.tunableChest)
 
   def init(): Unit =
     ItemStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm): (ent, _) =>
@@ -42,5 +46,12 @@ object BulbusBlockEntities:
       dir match
         case Direction.UP | Direction.DOWN => ent.getForwardedStorage(BulbusItemForwarders.forItem)
         case _ => ent.containerStorage
+    
+    ItemStorage.SIDED.registerScalaEntities(tunableChest): (ent, dir) =>
+      // fabric ContainerStorage docs:
+      // <p><b>Important note:</b> This wrapper assumes that the container owns its slots.
+      // If the container does not own its slots, for example because it delegates to another container, this wrapper should not be used!
+      ContainerStorage.of(ent.getContainer, dir)
+      
 
 

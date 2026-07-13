@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "bulbus:block/tunable_chest_bottom",
+    "side": "bulbus:block/tunable_chest_side",
+    "top": "bulbus:block/tunable_chest_top"
+  }
+}

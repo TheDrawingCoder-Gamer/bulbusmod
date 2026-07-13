@@ -1,5 +1,6 @@
 {
   "values": [
-    "bulbus:repair_machine"
+    "bulbus:repair_machine",
+    "bulbus:tunable_chest"
   ]
 }

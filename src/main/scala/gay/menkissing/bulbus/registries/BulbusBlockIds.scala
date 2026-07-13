@@ -9,3 +9,4 @@ object BulbusBlockIds:
   val stasisAccessor: Identifier = BulbusMod.locate("stasis_accessor")
 
   val repairMachine: Identifier = BulbusMod.locate("repair_machine")
+  val tunableChest: Identifier = BulbusMod.locate("tunable_chest")

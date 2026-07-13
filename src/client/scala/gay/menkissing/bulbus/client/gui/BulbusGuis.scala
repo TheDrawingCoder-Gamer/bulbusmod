@@ -8,4 +8,5 @@ object BulbusGuis:
   def register(): Unit =
     MenuScreens.register(BulbusScreens.toolContainer, ToolContainerGui.apply)
     MenuScreens.register(BulbusScreens.holdingBagMenu, ContainerScreen.apply)
+    MenuScreens.register(BulbusScreens.tunableChestMenu, ContainerScreen.apply)
     MenuScreens.register(BulbusScreens.stasisStorageMenu, StasisStorageGui.apply)

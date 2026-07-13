@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "bulbus:block/tunable_chest"
+    }
+  }
+}

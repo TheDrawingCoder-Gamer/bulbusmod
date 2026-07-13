@@ -35,12 +35,15 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
 
     translationBuilder.add(BulbusItems.repairMachine, "Repair-o-matic")
 
+    translationBuilder.add(BulbusItems.tunableChest, "Tunable Chest")
+
     translationBuilder.add(BulbusItems.knowledgeStorage, "Knowledge Storage")
     translationBuilder.add(BulbusTranslationKeys.knowledgeStorage.tooltip.count, "%1$s / %2$d")
 
     translationBuilder.add(BulbusTranslationKeys.tab, "Bulbus")
     translationBuilder.add(BulbusTranslationKeys.container.shelf, "Stasis Shelf")
     translationBuilder.add(BulbusTranslationKeys.container.worm, "Stasis Worm")
+    translationBuilder.add(BulbusTranslationKeys.container.tunableChest, "Tunable Chest")
 
     translationBuilder.add(BulbusSounds.stasisAccessorAddItem, "Stasis Accessor fills")
     translationBuilder.add(BulbusSounds.stasisAccessorRemoveItem, "Stasis Accessor empties")

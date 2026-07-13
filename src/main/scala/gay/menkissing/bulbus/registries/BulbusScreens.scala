@@ -13,6 +13,9 @@ object BulbusScreens:
   val toolContainer: ExtendedMenuType[ToolContainerMenu, Boolean] = 
     new ExtendedMenuType(ToolContainerMenu.fromNetwork, ByteBufCodecs.BOOL.map(_.booleanValue(), Boolean.box))
   
+  val tunableChestMenu: MenuType[ChestMenu] =
+    MenuType(ChestMenu.threeRows, FeatureFlags.VANILLA_SET)
+
   val holdingBagMenu: MenuType[ChestMenu] =
     MenuType(HoldingBagMenu.fromNetwork, FeatureFlags.VANILLA_SET)
   

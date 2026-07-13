@@ -1,6 +1,7 @@
 package gay.menkissing.bulbus.client.datagen.models
 
 import com.mojang.math.{Quadrant, Transformation}
+import gay.menkissing.bulbus.BulbusMod
 import gay.menkissing.bulbus.client.content.itemmodels.{BottleFluidContentsModel, TubeStoredItemSpecialRenderer}
 import gay.menkissing.bulbus.client.datagen.models.BulbusModelGenerator.*
 import gay.menkissing.bulbus.registries.{BulbusBlocks, BulbusItems}
@@ -17,8 +18,8 @@ import net.minecraft.core.Direction
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.util.random.WeightedList
-import net.minecraft.world.item.{Item, ItemDisplayContext}
-import net.minecraft.world.level.block.Block
+import net.minecraft.world.item.{DyeColor, Item, ItemDisplayContext}
+import net.minecraft.world.level.block.{Block, Blocks}
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.joml.{Matrix4f, Vector4f}
 
@@ -72,7 +73,20 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
         PropertyDispatch.initial(BlockStateProperties.OPEN)
                         .selectV(false, Variant(closedShelf))
                         .selectV(true, Variant(openShelf))
-  
+
+    val tunableChest = TexturedModel.CUBE_TOP_BOTTOM.create(BulbusBlocks.tunableChest, blockModelGenerators.modelOutput)
+    locally:
+      val freakyTemplate = ModelTemplate(Optional.of(BulbusMod.locate("block/tunable_chest_button")), Optional.empty(), TextureSlot.ALL)
+      DyeColor.values().foreach: color =>
+        val mapping = (new TextureMapping()).put(TextureSlot.ALL, Material(Identifier.withDefaultNamespace("block/" + color.getSerializedName + "_wool")))
+        // : )
+        freakyTemplate.createWithSuffix(BulbusBlocks.tunableChest, "_button_" + color.getSerializedName, mapping, blockModelGenerators.modelOutput)
+
+
+    blockModelGenerators.blockStateOutput.accept:
+      MultiVariantGenerator.dispatch(BulbusBlocks.tunableChest, BlockModelGenerators.plainVariant(tunableChest))
+
+
     val (closedWorm, openWorm) = barrelLikeModels(BulbusBlocks.stasisWorm, blockModelGenerators)
     blockModelGenerators.blockStateOutput.accept:
       MultiVariantGenerator.dispatch(BulbusBlocks.stasisWorm).`with`:

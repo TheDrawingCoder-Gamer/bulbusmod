@@ -7,6 +7,7 @@ import net.minecraft.core.registries.{BuiltInRegistries, Registries}
 import net.minecraft.resources.{Identifier, ResourceKey}
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.{Block, Blocks, SoundType}
+import gay.menkissing.bulbus.content.block.TunableChestBlock
 
 object BulbusBlocks:
   def register[T <: Block](id: Identifier, factory: BlockBehaviour.Properties => T, props: BlockBehaviour.Properties): T =
@@ -18,6 +19,9 @@ object BulbusBlocks:
   val stasisAccessor: Block = register(BulbusBlockIds.stasisAccessor, StasisAccessorBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(1.5f).noOcclusion())
 
   val repairMachine: Block = register(BulbusBlockIds.repairMachine, RepairMachineBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.STONE).strength(2.0f).noOcclusion())
+
+  val tunableChest: Block = register(BulbusBlockIds.tunableChest, TunableChestBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.STONE).strength(2.0f).noOcclusion())
+  
   
   def init(): Unit = ()
 

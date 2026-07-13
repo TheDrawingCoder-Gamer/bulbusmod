@@ -21,6 +21,7 @@ object BulbusTranslationKeys:
 
     val shelf: String = keyFor(BulbusItems.stasisShelf)
     val worm: String = keyFor(BulbusItems.stasisWorm)
+    val tunableChest: String = keyFor(BulbusItems.tunableChest)
 
   def tooltipFor(item: Item, tooltip: String): String =
     item.getDescriptionId + ".tooltip." + tooltip

@@ -16,3 +16,4 @@ class BulbusLootTableProvider(output: FabricPackOutput, lookup: CompletableFutur
     dropSelf(BulbusBlocks.stasisWorm)
     dropSelf(BulbusBlocks.stasisAccessor)
     dropSelf(BulbusBlocks.repairMachine)
+    dropSelf(BulbusBlocks.tunableChest)

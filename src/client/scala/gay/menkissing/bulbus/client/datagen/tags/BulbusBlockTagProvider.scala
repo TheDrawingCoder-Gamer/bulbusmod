@@ -17,3 +17,4 @@ class BulbusBlockTagProvider(output: FabricPackOutput, lookup: CompletableFuture
     
     valueLookupBuilder(BlockTags.MINEABLE_WITH_PICKAXE)
       .add(BulbusBlocks.repairMachine)
+      .add(BulbusBlocks.tunableChest)
