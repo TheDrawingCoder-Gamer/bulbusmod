@@ -33,10 +33,12 @@ import net.minecraft.world.Clearable
 import net.minecraft.core.particles.SimpleParticleType
 import gay.menkissing.bulbus.registries.BulbusParticles
 import net.minecraft.core.particles.ParticleTypes
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class RepairMachineBlockEntity
   (pos: BlockPos, state: BlockState)
-    extends BlockEntity(BulbusBlockEntities.repairMachine, pos, state), Clearable:
+    extends BlockEntity(BulbusBlockEntities.repairMachine, pos, state), Clearable, ClientSyncingBlockEntity:
   private var heldGemIntl: ItemStack = ItemStack.EMPTY
   private var primaryItemIntl: ItemStack = ItemStack.EMPTY
   // only used in rendering, so not persistent
@@ -64,11 +66,6 @@ class RepairMachineBlockEntity
   override def clearContent(): Unit =
     this.heldGem = ItemStack.EMPTY
     this.primaryItem = ItemStack.EMPTY
-
-  override def setChanged(): Unit =
-    super.setChanged()
-    if this.level != null && !this.level.isClientSide then
-      this.level.sendBlockUpdated(this.getBlockPos, this.getBlockState, this.getBlockState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS)
 
 
 
@@ -136,18 +133,17 @@ class RepairMachineBlockEntity
     if !primaryItem.isEmpty then
       output.store("primary_item", ItemStack.CODEC, primaryItem)
 
-  override def getUpdatePacket(): Packet[ClientGamePacketListener] | Null =
-    ClientboundBlockEntityDataPacket.create(this)
+  override protected def logger: Logger = RepairMachineBlockEntity.logger
 
-  override def getUpdateTag(registries: HolderLookup.Provider): CompoundTag =
-    val tag = new CompoundTag
-    if !heldGem.isEmpty then tag.store("held_gem", ItemStack.CODEC, heldGem)
+  override protected def saveClientTag(output: ValueOutput): Unit =
+    if !heldGem.isEmpty then output.store("held_gem", ItemStack.CODEC, heldGem)
     if !primaryItem.isEmpty then
-      tag.store("primary_item", ItemStack.CODEC, primaryItem)
-    tag.putBoolean("active", active)
-    tag
+      output.store("primary_item", ItemStack.CODEC, primaryItem)
+    output.putBoolean("active", active)
 
 object RepairMachineBlockEntity:
+  val logger: Logger = LoggerFactory.getLogger(classOf[RepairMachineBlockEntity])
+
   val durabilityPerTick: Int = 6
   // ???
   // slightly better than mending (1.5x!)

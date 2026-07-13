@@ -17,8 +17,9 @@ import net.minecraft.world.{Container, ContainerHelper}
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.util.Using
+import net.minecraft.world.level.storage.ValueOutput
 
-class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends StasisStorageBlockEntity(1, BulbusBlockEntities.stasisAccessor, pos, state):
+class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends StasisStorageBlockEntity(1, BulbusBlockEntities.stasisAccessor, pos, state), ClientSyncingBlockEntity:
   override val containerView: Container = new ContainerForStasisStorage
 
   override val containerStorage: ContainerStorage = ContainerStorage.of(containerView, null)
@@ -26,18 +27,10 @@ class StasisAccessorBlockEntity(pos: BlockPos, state: BlockState) extends Stasis
   def getStoredItem: ItemStack =
     items.get(0)
 
-  override def setChanged(): Unit =
-    super.setChanged()
-    if this.level != null && !this.level.isClientSide then
-      this.level.sendBlockUpdated(this.getBlockPos, this.getBlockState, this.getBlockState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS)
+  override protected def logger: Logger = StasisAccessorBlockEntity.logger
 
-  override def getUpdatePacket: Packet[ClientGamePacketListener] =
-    ClientboundBlockEntityDataPacket.create(this)
+  override protected def saveClientTag(output: ValueOutput): Unit =
+    ContainerHelper.saveAllItems(output, this.items)
 
-  override def getUpdateTag(registries: HolderLookup.Provider): CompoundTag =
-    Using.resource(ProblemReporter.ScopedCollector(this.problemPath(), StasisAccessorBlockEntity.Logger)): reporter =>
-      val output = TagValueOutput.createWithContext(reporter, registries)
-      ContainerHelper.saveAllItems(output, this.items)
-      output.buildResult()
 object StasisAccessorBlockEntity:
-  val Logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlockEntity])
+  val logger: Logger = LoggerFactory.getLogger(classOf[StasisAccessorBlockEntity])

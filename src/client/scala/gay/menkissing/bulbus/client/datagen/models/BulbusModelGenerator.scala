@@ -44,6 +44,15 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
     val openModel = ModelTemplates.CUBE_BOTTOM_TOP.createWithSuffix(block, "_open", openMapping, blockModelGenerators.modelOutput)
     (closedModel, openModel)
 
+  def horizontalPlacedBlock(block: Block, model: Identifier, blockModelGenerators: BlockModelGenerators): Unit =
+    blockModelGenerators.blockStateOutput.accept:
+      MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(model)).`with`:
+        PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_FACING)
+          .select(Direction.NORTH, VariantMutator.Y_ROT.withValue(Quadrant.R0))
+          .select(Direction.EAST, VariantMutator.Y_ROT.withValue(Quadrant.R90))
+          .select(Direction.SOUTH, VariantMutator.Y_ROT.withValue(Quadrant.R180))
+          .select(Direction.WEST, VariantMutator.Y_ROT.withValue(Quadrant.R270))
+
 
   override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
     val customAccessorModel = ModelLocationUtils.getModelLocation(BulbusBlocks.stasisAccessor)
@@ -75,21 +84,12 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
                         .selectV(true, Variant(openShelf))
 
     val tunableChest = TexturedModel.CUBE_TOP_BOTTOM.create(BulbusBlocks.tunableChest, blockModelGenerators.modelOutput)
-    locally:
-      val freakyTemplate = ModelTemplate(Optional.of(BulbusMod.locate("block/tunable_chest_button")), Optional.empty(), TextureSlot.ALL)
-      DyeColor.values().foreach: color =>
-        val mapping = (new TextureMapping()).put(TextureSlot.ALL, Material(Identifier.withDefaultNamespace("block/" + color.getSerializedName + "_wool")))
-        // : )
-        freakyTemplate.createWithSuffix(BulbusBlocks.tunableChest, "_button_" + color.getSerializedName, mapping, blockModelGenerators.modelOutput)
 
+    horizontalPlacedBlock(BulbusBlocks.tunableChest, tunableChest, blockModelGenerators)
 
-    blockModelGenerators.blockStateOutput.accept:
-      MultiVariantGenerator.dispatch(BulbusBlocks.tunableChest, BlockModelGenerators.plainVariant(tunableChest)).`with`:
-        PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_FACING)
-          .select(Direction.NORTH, VariantMutator.Y_ROT.withValue(Quadrant.R0))
-          .select(Direction.EAST, VariantMutator.Y_ROT.withValue(Quadrant.R90))
-          .select(Direction.SOUTH, VariantMutator.Y_ROT.withValue(Quadrant.R180))
-          .select(Direction.WEST, VariantMutator.Y_ROT.withValue(Quadrant.R270))
+    val tunableTank = TexturedModel.CUBE_TOP_BOTTOM.create(BulbusBlocks.tunableTank, blockModelGenerators.modelOutput)
+
+    horizontalPlacedBlock(BulbusBlocks.tunableTank, tunableTank, blockModelGenerators)
 
 
     val (closedWorm, openWorm) = barrelLikeModels(BulbusBlocks.stasisWorm, blockModelGenerators)
@@ -97,7 +97,7 @@ class BulbusModelGenerator(output: FabricPackOutput) extends FabricModelProvider
       MultiVariantGenerator.dispatch(BulbusBlocks.stasisWorm).`with`:
         PropertyDispatch.initial(BlockStateProperties.OPEN)
                         .selectV(false, Variant(closedWorm))
-                        // i tremor at the pour soul who looks into an open worm
+                        // i tremor at the poor soul who looks into an open worm
                         .selectV(true, Variant(openWorm))
       .`with`:
         PropertyDispatch.modify(BlockStateProperties.FACING).generate: dir =>

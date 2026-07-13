@@ -94,6 +94,8 @@ object BulbusItems:
 
   val tunableChest: Item = registerBlock(BulbusBlocks.tunableChest)
 
+  val tunableTank: Item = registerBlock(BulbusBlocks.tunableTank)
+
   val bulbusTab: CreativeModeTab =
     FabricCreativeModeTab.builder()
                          .icon(() => ItemStack(stasisBottle))
@@ -111,6 +113,7 @@ object BulbusItems:
                            output.accept(stasisAccessor)
                            output.accept(repairMachine)
                            output.accept(tunableChest)
+                           output.accept(tunableTank)
                          .build()
 
 

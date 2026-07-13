@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import team.reborn.energy.api.EnergyStorage
 import gay.menkissing.bulbus.content.block.entity.TunableChestBlockEntity
 import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage
+import gay.menkissing.bulbus.content.block.entity.TunableTankBlockEntity
 
 object BulbusBlockEntities:
   def makeEntity[T <: BlockEntity](name: String, factory: FabricBlockEntityTypeBuilder.Factory[T], blocks: Block*): BlockEntityType[T] =
@@ -30,6 +31,8 @@ object BulbusBlockEntities:
   val repairMachine: BlockEntityType[RepairMachineBlockEntity] = makeEntity("repair_machine", RepairMachineBlockEntity.apply, BulbusBlocks.repairMachine)
 
   val tunableChest: BlockEntityType[TunableChestBlockEntity] = makeEntity("tunable_chest", TunableChestBlockEntity.apply, BulbusBlocks.tunableChest)
+
+  val tunableTank: BlockEntityType[TunableTankBlockEntity] = makeEntity("tunable_tank", TunableTankBlockEntity.apply, BulbusBlocks.tunableTank)
 
   def init(): Unit =
     ItemStorage.SIDED.registerScalaEntities[StasisStorageBlockEntity](stasisShelf, stasisWorm): (ent, _) =>
@@ -51,7 +54,13 @@ object BulbusBlockEntities:
       // fabric ContainerStorage docs:
       // <p><b>Important note:</b> This wrapper assumes that the container owns its slots.
       // If the container does not own its slots, for example because it delegates to another container, this wrapper should not be used!
-      ContainerStorage.of(ent.getContainer, dir)
-      
+      val container = ent.getContainer
+      if container != null then
+        ContainerStorage.of(container, dir)
+      else
+        null
+    
+    FluidStorage.SIDED.registerScalaEntities(tunableTank): (ent, _) =>
+      ent.getContainer
 
 

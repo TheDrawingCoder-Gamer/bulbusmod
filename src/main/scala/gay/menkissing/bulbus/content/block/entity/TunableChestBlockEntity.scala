@@ -37,20 +37,32 @@ import gay.menkissing.bulbus.registries.BulbusBlockEntities
 
 class TunableChestBlockEntity
   (pos: BlockPos, state: BlockState)
-    extends BlockEntity(BulbusBlockEntities.tunableChest, pos, state):
-  private var channelIntl: TuningChannel = TuningChannel.DEFAULT
+    extends BlockEntity(BulbusBlockEntities.tunableChest, pos, state), TunableBlockEntity:
   var currentList: Option[NonNullList[ItemStack]] = None
   private var cachedContainer: Option[ContainerInstance] = None
 
-  def getContainer: ContainerInstance =
+  override protected def logger: Logger = TunableChestBlockEntity.logger
+
+  override protected def clearChannelCache(): Unit =
+    currentList = None
+    cachedContainer = None
+  
+  override protected def loadChannelData(tunable: TunableStorageData): Unit =
+    currentList = Some(tunable.getOrCreateSlots(channel))
+
+  def getContainer: ContainerInstance | Null =
     cachedContainer match
       case Some(it) => it
       case None =>
-        if currentList.isEmpty then
-          currentList = getTuner.map(_.getOrCreateSlots(channel))
-        val instance = new ContainerInstance(channel, currentList.get)
-        cachedContainer = Some(instance)
-        instance
+        if level.isClientSide then
+          null
+        else
+          if currentList.isEmpty then
+            currentList = getTuner.map(_.getOrCreateSlots(channel))
+          val instance = new ContainerInstance(channel, currentList.get)
+          cachedContainer = Some(instance)
+          instance
+          
 
   // We can't be clearable, so we can't directly implement container
   class ContainerInstance(openedWith: TuningChannel, override val getItems: NonNullList[ItemStack]) extends ListBackedContainer, MenuProvider:
@@ -67,50 +79,6 @@ class TunableChestBlockEntity
     override def setChanged(): Unit =
       TunableChestBlockEntity.this.setChanged()
 
-  override def setChanged(): Unit =
-    super.setChanged()
-    getTuner.foreach(_.setDirty())
-    if this.level != null && !this.level.isClientSide then
-      this.level.sendBlockUpdated(this.getBlockPos, this.getBlockState, this.getBlockState, Block.UPDATE_CLIENTS | Block.UPDATE_NEIGHBORS)
-
-
-  def channel: TuningChannel = channelIntl
-
-  def getTuner: Option[TunableStorageData] =
-    level match
-      case null                     => None
-      case serverLevel: ServerLevel =>
-        val server = serverLevel.getServer
-        val tunable = TunableStorageData.get(server)
-        Some(tunable)
-      case _ => None
-
-  def channel_=(value: TuningChannel): Unit =
-    channelIntl = value
-    currentList = None
-    cachedContainer = None
-    getTuner.foreach: tunable =>
-      currentList = Some(tunable.getOrCreateSlots(value))
-
-    setChanged()
-
-  override def getUpdatePacket: Packet[ClientGamePacketListener] =
-    ClientboundBlockEntityDataPacket.create(this)
-  
-  override def getUpdateTag(registries: Provider): CompoundTag =
-    Using.resource(ProblemReporter.ScopedCollector(this.problemPath(), TunableChestBlockEntity.logger)): reporter =>
-      val output = TagValueOutput.createWithContext(reporter, registries)
-      output.store("channel", TuningChannel.CODEC, channel)
-      output.buildResult()
-
-  override protected def loadAdditional(input: ValueInput): Unit =
-    super.loadAdditional(input)
-    channel =
-      input.read("channel", TuningChannel.CODEC).orElse(TuningChannel.DEFAULT)
-
-  override protected def saveAdditional(output: ValueOutput): Unit =
-    super.saveAdditional(output)
-    output.store("channel", TuningChannel.CODEC, channel)
 
 object TunableChestBlockEntity:
   val logger: Logger = LoggerFactory.getLogger(classOf[TunableChestBlockEntity])

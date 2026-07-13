@@ -37,6 +37,8 @@ class BulbusLangGenerator(output: FabricPackOutput, registries: CompletableFutur
 
     translationBuilder.add(BulbusItems.tunableChest, "Tunable Chest")
 
+    translationBuilder.add(BulbusItems.tunableTank, "Tunable Tank")
+
     translationBuilder.add(BulbusItems.knowledgeStorage, "Knowledge Storage")
     translationBuilder.add(BulbusTranslationKeys.knowledgeStorage.tooltip.count, "%1$s / %2$d")
 

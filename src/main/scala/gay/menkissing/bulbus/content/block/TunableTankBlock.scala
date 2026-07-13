@@ -31,39 +31,26 @@ import gay.menkissing.bulbus.util.BulbusConstants
 import com.mojang.math.Axis
 import org.joml.Vector3f
 import com.mojang.math.OctahedralGroup
+import gay.menkissing.bulbus.content.block.entity.TunableBlockEntity
+import gay.menkissing.bulbus.content.block.entity.TunableTankBlockEntity
 
-final class TunableChestBlock
+final class TunableTankBlock
   (props: BlockBehaviour.Properties)
     extends TunableBlock(props):
-  
 
   override protected def codec(): MapCodec[? <: BaseEntityBlock] =
-    TunableChestBlock.CODEC
-
-
-
+    TunableTankBlock.CODEC
   override def newBlockEntity
     (worldPosition: BlockPos, blockState: BlockState): BlockEntity =
-    new TunableChestBlockEntity(worldPosition, blockState)
+    new TunableTankBlockEntity(worldPosition, blockState)
 
-  override protected def useWithoutItem
-    (
-      state: BlockState,
-      level: Level,
-      pos: BlockPos,
-      player: Player,
-      hitResult: BlockHitResult
-    ): InteractionResult =
-    if level.isClientSide then InteractionResult.SUCCESS
-    else
-      val blockEntity = level.getBlockEntity(pos)
-      blockEntity match
-        case be: TunableChestBlockEntity => player.openMenu(be.getContainer)
-        case _                           => ()
-      InteractionResult.CONSUME
+object TunableTankBlock:
+  val CODEC: MapCodec[TunableTankBlock] =
+    BlockBehaviour.simpleCodec(TunableTankBlock.apply)
 
   
 
-object TunableChestBlock:
-  val CODEC: MapCodec[TunableChestBlock] =
-    BlockBehaviour.simpleCodec(TunableChestBlock.apply)
+  
+
+
+

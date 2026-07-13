@@ -1,6 +1,0 @@
-{
-  "parent": "bulbus:block/tunable_chest_button",
-  "textures": {
-    "all": "minecraft:block/orange_wool"
-  }
-}

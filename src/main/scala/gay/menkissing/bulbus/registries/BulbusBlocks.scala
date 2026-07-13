@@ -8,6 +8,7 @@ import net.minecraft.resources.{Identifier, ResourceKey}
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.{Block, Blocks, SoundType}
 import gay.menkissing.bulbus.content.block.TunableChestBlock
+import gay.menkissing.bulbus.content.block.TunableTankBlock
 
 object BulbusBlocks:
   def register[T <: Block](id: Identifier, factory: BlockBehaviour.Properties => T, props: BlockBehaviour.Properties): T =
@@ -21,7 +22,7 @@ object BulbusBlocks:
   val repairMachine: Block = register(BulbusBlockIds.repairMachine, RepairMachineBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.STONE).strength(2.0f).noOcclusion())
 
   val tunableChest: Block = register(BulbusBlockIds.tunableChest, TunableChestBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.STONE).strength(2.0f).noOcclusion())
-  
+  val tunableTank: Block = register(BulbusBlockIds.tunableTank, TunableTankBlock.apply, BlockBehaviour.Properties.of().sound(SoundType.STONE).strength(2.0f).noOcclusion())
   
   def init(): Unit = ()
 

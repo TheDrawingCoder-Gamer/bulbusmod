@@ -87,6 +87,10 @@ dependencies {
 
     // for testing energy
     runtimeOnly "maven.modrinth:techreborn:6.0.5"
+    // for testing fluid
+    runtimeOnly "maven.modrinth:create-fly:26.1.2-6.0.9-4"
+    // for viewing container contents
+    runtimeOnly "maven.modrinth:jade:26.1.8+fabric"
 }
 
 processResources {

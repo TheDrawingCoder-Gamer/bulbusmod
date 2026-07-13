@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "bulbus:block/tunable_tank",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "bulbus:block/tunable_tank"
+    },
+    "facing=south": {
+      "model": "bulbus:block/tunable_tank",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "bulbus:block/tunable_tank",
+      "y": 270
+    }
+  }
+}
