@@ -83,6 +83,7 @@ dependencies {
     include api('teamreborn:energy:5.0.0')
 
     implementation('org.scala-lang:scala3-library_3:3.8.4')
+    implementation('org.typelevel:cats-core_3:2.13.0')
     runtimeOnly("com.kotori316:scalable-cats-force-fabric:5.0.0:dev")
 
     // for testing energy
@@ -121,6 +122,7 @@ java {
 tasks.withType(ScalaCompile).configureEach {
     it.scalaCompileOptions.additionalParameters.add("-release:25")
     it.scalaCompileOptions.additionalParameters.add("-Yexplicit-nulls")
+    it.scalaCompileOptions.additionalParameters.add("-Xkind-projector:underscores")
 }
 
 jar {

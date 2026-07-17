@@ -11,6 +11,11 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 
+import gay.menkissing.bulbus.util.dfu.{*, given}
+
+import cats.*
+import cats.implicits.*
+
 final case class StorageItemContents[T <: TransferVariant[?]](variant: T, amount: Long):
   def isEmpty: Boolean =
     variant.isBlank || amount <= 0
@@ -18,12 +23,11 @@ final case class StorageItemContents[T <: TransferVariant[?]](variant: T, amount
 
 object StorageItemContents:
   def codecFor[T <: TransferVariant[?]](variantCodec: Codec[T]): Codec[StorageItemContents[T]] =
-    RecordCodecBuilder.create(inst =>
-      inst.group(
-        variantCodec.fieldOf("variant").forGetter(it => it.variant),
+    simpleBuiltCodec[StorageItemContents[T]]:
+      _.map2(
+        variantCodec.fieldOf("variant").forGetter(_.variant),
         Codec.LONG.fieldOf("amount").forGetter(_.amount)
-      ).apply(inst, (a, b) => StorageItemContents(a, b))
-    )
+      )(StorageItemContents.apply)
 
   def streamCodecFor[T <: TransferVariant[?]](variantCodec: StreamCodec[RegistryFriendlyByteBuf, T]): StreamCodec[RegistryFriendlyByteBuf, StorageItemContents[T]] =
     StreamCodec.composite(
