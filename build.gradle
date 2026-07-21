@@ -52,6 +52,14 @@ repositories {
     // for more information about repositories.
     mavenCentral()
     maven {
+      name = "Menkisser Inc. Snapshots"
+      url = uri("https://maven.menkissing.gay/snapshots")
+    }
+    maven {
+      name = "Menkisser Inc. Releases"
+      url = uri("https://maven.menkissing.gay/releases")
+    }
+    maven {
         name = "Kotori316"
         // See https://maven.kotori316.com for versions
         url = uri("https://maven.kotori316.com")
@@ -81,6 +89,8 @@ dependencies {
     implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     include api('teamreborn:energy:5.0.0')
+
+    include implementation("gay.menkissing:dfu-scala_3:0.2-b057c24-SNAPSHOT")
 
     implementation('org.scala-lang:scala3-library_3:3.8.4')
     implementation('org.typelevel:cats-core_3:2.13.0')

@@ -11,7 +11,8 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.ItemStack
 
-import gay.menkissing.bulbus.util.dfu.{*, given}
+import gay.menkissing.datafixerupper.simpleBuiltCodec
+import gay.menkissing.datafixerupper.syntax.{*, given}
 
 import cats.*
 import cats.implicits.*

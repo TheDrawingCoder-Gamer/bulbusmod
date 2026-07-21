@@ -23,3 +23,7 @@ run
 .cache
 .metals
 .vscode
+.bloop
+
+# idk where this came from
+bin
