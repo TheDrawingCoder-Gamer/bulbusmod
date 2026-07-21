@@ -7,6 +7,7 @@ import net.fabricmc.api.ModInitializer
 import net.minecraft.resources.Identifier
 import gay.menkissing.bulbus.registries.BulbusParticles
 import gay.menkissing.bulbus.registries.BulbusComponentPredicates
+import gay.menkissing.bulbus.registries.BulbusEntities
 
 class BulbusMod extends ModInitializer:
   override def onInitialize(): Unit =
@@ -14,6 +15,7 @@ class BulbusMod extends ModInitializer:
     BulbusComponentPredicates.init()
     BulbusBlocks.init()
     BulbusBlockEntities.init()
+    BulbusEntities.init()
     BulbusItems.init()
     StasisStorage.init()
     BulbusBuiltInRegistries.init()

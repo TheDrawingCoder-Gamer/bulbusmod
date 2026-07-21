@@ -15,3 +15,4 @@ object BulbusItemIds:
   val holdingBag: ItemIdentifier = BulbusMod.locate("holding_bag")
   val toolContainer: ItemIdentifier = BulbusMod.locate("tool_container")
   val knowledgeStorage: ItemIdentifier = BulbusMod.locate("knowledge_storage")
+  val repairBottle: ItemIdentifier = BulbusMod.locate("repair_bottle")

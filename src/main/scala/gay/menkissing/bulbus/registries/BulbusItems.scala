@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.Block
 import team.reborn.energy.api.EnergyStorage
 import team.reborn.energy.api.base.SimpleEnergyStorage
 import net.minecraft.resources.Identifier
+import gay.menkissing.bulbus.content.item.RepairBottleItem
 
 object BulbusItems:
   def register[T <: Item](id: Identifier, props: Item.Properties, itemFactory: Item.Properties => T): T =
@@ -84,6 +85,13 @@ object BulbusItems:
     KnowledgeStorageItem.apply
   )
 
+  val repairBottle: Item = register(
+    BulbusItemIds.repairBottle,
+    Item.Properties()
+        .stacksTo(16),
+    RepairBottleItem.apply
+  )
+
   val stasisShelf: Item = registerBlock(BulbusBlocks.stasisShelf)
 
   val stasisWorm: Item = registerBlock(BulbusBlocks.stasisWorm)
@@ -107,7 +115,8 @@ object BulbusItems:
                            output.accept(holdingBag)
                            output.accept(toolContainer)
                            output.accept(knowledgeStorage)
-                           
+                           output.accept(repairBottle)
+
                            output.accept(stasisShelf)
                            output.accept(stasisWorm)
                            output.accept(stasisAccessor)
