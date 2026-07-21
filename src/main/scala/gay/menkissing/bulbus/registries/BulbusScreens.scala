@@ -8,19 +8,31 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.world.flag.{FeatureFlagSet, FeatureFlags}
 import net.minecraft.world.inventory.{ChestMenu, MenuType}
+import net.minecraft.world.entity.player.Inventory
+import net.minecraft.world.inventory.AbstractContainerMenu
+import scala.annotation.nowarn
 
 object BulbusScreens:
   val toolContainer: ExtendedMenuType[ToolContainerMenu, Boolean] = 
     new ExtendedMenuType(ToolContainerMenu.fromNetwork, ByteBufCodecs.BOOL.map(_.booleanValue(), Boolean.box))
   
+  def sup[T <: AbstractContainerMenu](f: (Int, Inventory) => T): MenuType.MenuSupplier[T] =
+    // ???????????
+    new MenuType.MenuSupplier[T]:
+      def create(containerId: Int, inventory: Inventory): T = f(containerId, inventory)
+
+  def simpleMenu[T <: AbstractContainerMenu](f: (Int, Inventory) => T): MenuType[T] =
+    MenuType(f.apply: @nowarn, FeatureFlags.VANILLA_SET)
+    
+
   val tunableChestMenu: MenuType[ChestMenu] =
-    MenuType(ChestMenu.threeRows, FeatureFlags.VANILLA_SET)
+    simpleMenu(ChestMenu.threeRows)
 
   val holdingBagMenu: MenuType[ChestMenu] =
-    MenuType(HoldingBagMenu.fromNetwork, FeatureFlags.VANILLA_SET)
+    simpleMenu(HoldingBagMenu.fromNetwork)
   
   val stasisStorageMenu: MenuType[StasisStorageMenu] =
-    MenuType(StasisStorageMenu.client, FeatureFlags.VANILLA_SET)
+    simpleMenu(StasisStorageMenu.client)
   
   def init(): Unit =
     Registry.register(BuiltInRegistries.MENU, BulbusMod.locate("tool_container"), toolContainer)

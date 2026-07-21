@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import net.minecraft.core.Direction
 import com.mojang.math.Axis
 import gay.menkissing.bulbus.content.block.entity.TunableBlockEntity
+import net.minecraft.data.AtlasIds
 
 class TunableRenderer
   (ctx: BlockEntityRendererProvider.Context)
@@ -84,7 +85,7 @@ class TunableRenderer
 
       val spriteId =
         SpriteId(
-          TextureAtlas.LOCATION_BLOCKS,
+          AtlasIds.BLOCKS,
           Identifier
             .withDefaultNamespace("block/" + color.getSerializedName + "_wool")
         )

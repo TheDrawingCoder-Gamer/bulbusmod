@@ -54,6 +54,7 @@ class TunableChestBlockEntity
     cachedContainer match
       case Some(it) => it
       case None =>
+        // for jade (sorry jade : /)
         if level.isClientSide then
           null
         else

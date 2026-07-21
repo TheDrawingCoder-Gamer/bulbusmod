@@ -28,6 +28,7 @@ import org.joml.{Matrix4fc, Vector3f, Vector4f, Vector4fc}
 
 import java.util as ju
 import scala.collection.mutable
+import net.minecraft.data.AtlasIds
 
 // Renders a fluid, completely filling the slot
 class BottleFluidContentsModel(val transform: Matrix4fc, val crop: Vector4fc, val bakingContext: ItemModel.BakingContext) extends ItemModel:
@@ -89,7 +90,7 @@ object BottleFluidContentsModel:
   def computeFluidItemRenderType(material: Material.Baked): RenderType =
     val translucent = material.forceTranslucent() || material.sprite().transparency().hasTranslucent
     // val translucent = false
-    if material.sprite().atlasLocation() == TextureAtlas.LOCATION_BLOCKS then
+    if material.sprite().atlasLocation() == AtlasIds.BLOCKS then
       if translucent then
         Sheets.translucentBlockItemSheet()
       else

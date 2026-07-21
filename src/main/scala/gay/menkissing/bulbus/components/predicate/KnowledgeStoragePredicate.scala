@@ -4,7 +4,6 @@ import net.minecraft.advancements.criterion.MinMaxBounds
 import net.minecraft.core.component.predicates.DataComponentPredicate
 import net.minecraft.core.component.DataComponentGetter
 import gay.menkissing.bulbus.registries.BulbusDataComponentTypes
-import gay.menkissing.bulbus.util.MinMaxLongs
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import gay.menkissing.bulbus.content.item.KnowledgeStorageItem

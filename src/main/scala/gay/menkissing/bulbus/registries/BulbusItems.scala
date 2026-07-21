@@ -16,13 +16,13 @@ import net.minecraft.world.item.{BlockItem, CreativeModeTab, Item, ItemStack}
 import net.minecraft.world.level.block.Block
 import team.reborn.energy.api.EnergyStorage
 import team.reborn.energy.api.base.SimpleEnergyStorage
+import net.minecraft.resources.Identifier
 
 object BulbusItems:
-  def register[T <: Item](name: String, props: Item.Properties, itemFactory: Item.Properties => T): T =
-    val id = BulbusMod.locate(name)
+  def register[T <: Item](id: Identifier, props: Item.Properties, itemFactory: Item.Properties => T): T =
     val goodProps = props.setId(ResourceKey.create(Registries.ITEM, id))
     val goodItem = itemFactory(goodProps)
-    Registry.register(BuiltInRegistries.ITEM, BulbusMod.locate(name), goodItem)
+    Registry.register(BuiltInRegistries.ITEM, id, goodItem)
     goodItem
 
 
@@ -35,7 +35,7 @@ object BulbusItems:
     Registry.register(BuiltInRegistries.ITEM, itemId, item)
 
   val stasisBottle: Item = register(
-    "stasis_bottle",
+    BulbusItemIds.stasisBottle,
     Item.Properties()
         .enchantable(5)
         .component(BulbusDataComponentTypes.STASIS_BOTTLE_CONTENTS, StorageItemContents.Fluid.DEFAULT)
@@ -44,7 +44,7 @@ object BulbusItems:
   )
 
   val stasisTube: Item = register(
-    "stasis_tube",
+    BulbusItemIds.stasisTube,
     Item.Properties()
         .enchantable(5)
         .component(BulbusDataComponentTypes.STASIS_TUBE_CONTENTS, StorageItemContents.Item.DEFAULT)
@@ -53,7 +53,7 @@ object BulbusItems:
   )
 
   val stasisBattery: StasisBatteryItem = register(
-    "stasis_battery",
+    BulbusItemIds.stasisBattery,
     Item.Properties()
         .component(EnergyStorage.ENERGY_COMPONENT, 0L)
         .enchantable(5)
@@ -62,21 +62,21 @@ object BulbusItems:
   )
 
   val holdingBag: Item = register(
-    "holding_bag",
+    BulbusItemIds.holdingBag,
     Item.Properties()
         .stacksTo(1),
     HoldingBagItem.apply
   )
   
   val toolContainer: Item = register(
-    "tool_container",
+    BulbusItemIds.toolContainer,
     Item.Properties()
         .stacksTo(1),
     ToolContainerItem.apply
   )
   
   val knowledgeStorage: Item = register(
-    "knowledge_storage",
+    BulbusItemIds.knowledgeStorage,
     Item.Properties()
         .component(BulbusDataComponentTypes.KNOWLEDGE_STORAGE_CONTENTS, 0)
         .enchantable(5)

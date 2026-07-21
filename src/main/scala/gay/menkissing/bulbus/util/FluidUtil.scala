@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.{Block, LiquidBlockContainer}
 import net.minecraft.world.level.material.{FlowingFluid, Fluid, Fluids}
 import net.minecraft.world.phys.BlockHitResult
 
-import scala.annotation.tailrec
+import scala.annotation.{tailrec, nowarn}
 import scala.util.Using
 
 object FluidUtil:
@@ -45,7 +45,7 @@ object FluidUtil:
 
       if !destBlockState.isAir && !isDestReplaceable && !canDestContainFluid then
         hitResult != null && placeFluid(player, level, hitResult.getBlockPos.relative(hitResult.getDirection), null, variant)
-      else if level.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos).booleanValue() && variant.getFluid.is(FluidTags.WATER) then
+      else if level.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos).booleanValue() && variant.getFluid.is(FluidTags.WATER): @nowarn then
         val x = pos.getX
         val y = pos.getY
         val z = pos.getZ
@@ -63,7 +63,7 @@ object FluidUtil:
         playEmptyingSound(player, level, pos, variant)
         true
       else
-        if !level.isClientSide && isDestReplaceable && !destBlockState.liquid() then
+        if !level.isClientSide && isDestReplaceable && !destBlockState.liquid(): @nowarn then
           level.removeBlock(pos, true)
 
         if level.setBlock(pos, flowingFluid.getSource(false).createLegacyBlock(), Block.UPDATE_ALL_IMMEDIATE) then
